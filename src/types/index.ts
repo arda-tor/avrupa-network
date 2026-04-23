@@ -1,0 +1,20 @@
+export type AvatarVariant = "a1" | "a2" | "a3" | "a4" | "a5" | "a6";
+
+export interface User {
+  id: string;
+  name: string;
+  initial: string;
+  role: string;
+  location: string;
+  bio: string;
+  skills: string[];
+  matchPercent: number;
+  avatarVariant: AvatarVariant;
+  spotlight?: boolean;
+  spotlightTag?: string;
+}
+
+export interface FilterOption {
+  id: string;
+  label: string;
+}
