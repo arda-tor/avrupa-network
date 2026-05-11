@@ -4,7 +4,14 @@ interface SectionHeaderProps {
   meta?: string;
 }
 
-export default function SectionHeader({ title: _title, emphasis: _emphasis, meta: _meta }: SectionHeaderProps) {
-  // TODO: HTML'deki .section-head bloğunu buraya taşı
-  return <div />;
+export default function SectionHeader({ title, emphasis, meta }: SectionHeaderProps) {
+  return (
+    <div className="section-head">
+      <h2>
+        {title}
+        {emphasis ? <> <em>{emphasis}</em></> : null}
+      </h2>
+      {meta ? <div className="section-meta">{meta}</div> : null}
+    </div>
+  );
 }

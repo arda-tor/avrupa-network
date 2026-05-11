@@ -8,7 +8,6 @@ export const currentUser: User = {
   location: "İstanbul",
   bio: "Dijital ürünler tasarlıyorum. Erişilebilirlik ve tipografi en büyük tutkum. Yeni insanlarla fikir alışverişine her zaman açığım.",
   skills: ["UI Tasarım", "Figma", "Tipografi", "Prototipleme", "+8 daha"],
-  matchPercent: 100,
   avatarVariant: "a1",
 };
 
@@ -21,7 +20,6 @@ export const users: User[] = [
     location: "Berlin",
     bio: "15 yıldır açık kaynak projelerde çalışıyor, dağıtık sistemler üzerine iki kitap yazdım. Yeni mezunlara mentorluk yapıyorum.",
     skills: ["Go", "Sistem Tasarımı", "Mentorluk", "Kubernetes"],
-    matchPercent: 0,
     avatarVariant: "a2",
     spotlight: true,
     spotlightTag: "◆ Öne Çıkan Profil",
@@ -34,7 +32,6 @@ export const users: User[] = [
     location: "Ankara",
     bio: "Çocuk kitapları ve editorial çizimler. Doğa ve mitoloji temalarını seviyorum.",
     skills: ["Procreate", "Çizim", "Storyboard"],
-    matchPercent: 87,
     avatarVariant: "a3",
   },
   {
@@ -45,7 +42,6 @@ export const users: User[] = [
     location: "İzmir",
     bio: "Film ve podcast için ses tasarımı. Alan kayıtları ve modüler sentez ile uğraşıyorum.",
     skills: ["Pro Tools", "Miksaj", "Field Recording"],
-    matchPercent: 72,
     avatarVariant: "a4",
   },
   {
@@ -56,7 +52,6 @@ export const users: User[] = [
     location: "İstanbul",
     bio: "İklim değişikliği üzerine modelleme yapıyorum. Her cumartesi atölye düzenliyorum.",
     skills: ["Python", "ML", "R", "İklim"],
-    matchPercent: 94,
     avatarVariant: "a5",
   },
   {
@@ -67,7 +62,6 @@ export const users: User[] = [
     location: "Antalya",
     bio: "Belgesel fotoğraf ve analog film. Karanlık odam da var, davet ediyorum.",
     skills: ["Analog", "Portre", "Sokak"],
-    matchPercent: 68,
     avatarVariant: "a6",
   },
   {
@@ -78,7 +72,6 @@ export const users: User[] = [
     location: "İstanbul",
     bio: "Kültür ve teknoloji üzerine yazıyorum. İki dergide editörlük yapıyorum.",
     skills: ["Editörlük", "Röportaj", "Çeviri"],
-    matchPercent: 81,
     avatarVariant: "a1",
   },
   {
@@ -89,7 +82,6 @@ export const users: User[] = [
     location: "Eskişehir",
     bio: "Blender ve Houdini ile animasyon. Yeni başlayanlara ücretsiz ders veriyorum.",
     skills: ["Blender", "Houdini", "Animasyon"],
-    matchPercent: 76,
     avatarVariant: "a2",
   },
 ];

@@ -8,7 +8,21 @@ interface FiltersProps {
   onChange: (id: string) => void;
 }
 
-export default function Filters({ options: _options, activeId: _activeId, onChange: _onChange }: FiltersProps) {
-  // TODO: HTML'deki .filters bloğunu buraya taşı, buton aktif state'ini onChange ile yönet
-  return <div />;
+export default function Filters({ options, activeId, onChange }: FiltersProps) {
+  return (
+    <div className="filters">
+      <span className="filter-label">Filtrele:</span>
+      {options.map((option) => (
+        <button
+          key={option.id}
+          type="button"
+          className={`filter${activeId === option.id ? " active" : ""}`}
+          aria-pressed={activeId === option.id}
+          onClick={() => onChange(option.id)}
+        >
+          {option.label}
+        </button>
+      ))}
+    </div>
+  );
 }

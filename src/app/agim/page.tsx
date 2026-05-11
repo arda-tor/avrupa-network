@@ -1,87 +1,119 @@
-import { users, savedUserIds } from "@/data/users";
+"use client";
 
-const savedUsers = users.filter((u) => savedUserIds.includes(u.id));
+import Link from "next/link";
+import { useMemo, useState } from "react";
+import Footer from "@/components/layout/Footer";
+import Navbar from "@/components/layout/Navbar";
+import { users } from "@/data/users";
+import { removeUserFromNetwork, useConnectedUsersState, useSavedUsersState } from "@/lib/mock-social";
 
 export default function Agim() {
+  const [query, setQuery] = useState("");
+  const { savedUserIds } = useSavedUsersState();
+  const { connectedUserIds } = useConnectedUsersState();
+
+  const savedUsers = useMemo(
+    () => users.filter((user) => savedUserIds.includes(user.id)),
+    [savedUserIds]
+  );
+
+  const filteredUsers = useMemo(() => {
+    const normalizedQuery = query.trim().toLowerCase();
+    if (!normalizedQuery) return savedUsers;
+
+    return savedUsers.filter((user) =>
+      [user.name, user.role, user.location, user.bio, ...user.skills]
+        .join(" ")
+        .toLowerCase()
+        .includes(normalizedQuery)
+    );
+  }, [query, savedUsers]);
+
   return (
     <div className="wrap">
+      <Navbar
+        activePath="/agim"
+        rightContent={(
+          <input
+            type="text"
+            className="search"
+            placeholder="Favorilerimde ara..."
+            value={query}
+            onChange={(event) => setQuery(event.target.value)}
+          />
+        )}
+      />
 
-      {/* NAV */}
-      <nav>
-        <div className="logo">
-          <div className="logo-mark">N</div>
-          Nexus
-        </div>
-        <div className="nav-links">
-          <a href="/">Keşfet</a>
-          <a href="/agim" className="active">Ağım</a>
-          <a href="#">Mesajlar</a>
-          <a href="/profil/duzenle">Profilim</a>
-        </div>
-        <div className="nav-actions">
-          <input type="text" className="search" placeholder="Ağımda ara…" readOnly />
-        </div>
-      </nav>
-
-      {/* PAGE HEAD */}
       <div className="section-head network-page-head">
         <h2>
-          Ağım <em className="network-count-em">{savedUsers.length}</em>
+          Favorilerim <em className="network-count-em">{savedUsers.length}</em>
         </h2>
-        <div className="section-meta">kaydettiğin kişiler</div>
+        <div className="section-meta">kaydettigin kisiler</div>
       </div>
 
-      {/* EMPTY STATE */}
-      {savedUsers.length === 0 && (
+      {savedUsers.length === 0 ? (
         <div className="network-empty">
           <div className="network-empty-icon">◌</div>
-          <p>Henüz kimseyi kaydetmedin.</p>
-          <a href="/" className="btn-ghost network-empty-link">Keşfetmeye Başla</a>
+          <p>Henuz kimseyi kaydetmedin.</p>
+          <Link href="/" className="btn-ghost network-empty-link">Kesfetmeye Basla</Link>
         </div>
-      )}
+      ) : null}
 
-      {/* GRID */}
-      {savedUsers.length > 0 && (
+      {savedUsers.length > 0 && filteredUsers.length === 0 ? (
+        <div className="network-empty">
+          <div className="network-empty-icon">◌</div>
+          <p>Aramana uyan kayitli profil bulunamadi.</p>
+          <button type="button" className="btn-ghost network-empty-link" onClick={() => setQuery("")}>
+            Aramayi Temizle
+          </button>
+        </div>
+      ) : null}
+
+      {filteredUsers.length > 0 ? (
         <section className="grid">
-          {savedUsers.map((user) => (
-            <div key={user.id} className="card fade-up">
-              <div className="card-top">
-                <div className={`card-avatar ${user.avatarVariant}`}>{user.initial}</div>
-                <div className="card-arrow">
-                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                    <path d="M7 17L17 7M17 7H7M17 7V17" />
-                  </svg>
+          {filteredUsers.map((user) => {
+            const isConnected = connectedUserIds.includes(user.id);
+
+            return (
+              <div key={user.id} className="card fade-up">
+                <Link href={`/profil/${user.id}`} className="card-main-link" aria-label={`${user.name} profil detaylarini ac`}>
+                  <div className="card-top">
+                    <div className={`card-avatar ${user.avatarVariant}`}>{user.initial}</div>
+                    <div className="card-arrow">
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                        <path d="M7 17L17 7M17 7H7M17 7V17" />
+                      </svg>
+                    </div>
+                  </div>
+                  <div>
+                    <div className="card-name">{user.name}</div>
+                    <div className="card-role">{user.role}</div>
+                    <div className="card-loc">{user.location}</div>
+                  </div>
+                  <p className="card-desc">{user.bio}</p>
+                  <div className="card-skills">
+                    {user.skills.map((skill) => (
+                      <span key={skill} className="mini-chip">{skill}</span>
+                    ))}
+                  </div>
+                </Link>
+                <div className="card-footer">
+                  <div className="network-status">{isConnected ? "◆ Bagli" : "◆ Kaydedildi"}</div>
+                  <button
+                    type="button"
+                    className="card-connect network-remove"
+                    onClick={() => removeUserFromNetwork(user.id)}
+                  >
+                    Kaldir
+                  </button>
                 </div>
               </div>
-              <div>
-                <div className="card-name">{user.name}</div>
-                <div className="card-role">{user.role}</div>
-                <div className="card-loc">{user.location}</div>
-              </div>
-              <p className="card-desc">{user.bio}</p>
-              <div className="card-skills">
-                {user.skills.map((s) => (
-                  <span key={s} className="mini-chip">{s}</span>
-                ))}
-              </div>
-              <div className="card-footer">
-                <div className="card-match network-connected">◆ Bağlı</div>
-                <button type="button" className="card-connect network-remove">Kaldır</button>
-              </div>
-            </div>
-          ))}
+            );
+          })}
         </section>
-      )}
+      ) : null}
 
-      {/* FOOTER */}
-      <div className="foot">
-        <div>© Nexus · 2026</div>
-        <div className="foot-dots">
-          <span></span><span></span><span></span><span></span>
-        </div>
-        <div>v0.4.2 · Yapan: Sen &amp; Biz</div>
-      </div>
-
+      <Footer />
     </div>
   );
 }

@@ -8,7 +8,6 @@ export interface User {
   location: string;
   bio: string;
   skills: string[];
-  matchPercent: number;
   avatarVariant: AvatarVariant;
   spotlight?: boolean;
   spotlightTag?: string;
