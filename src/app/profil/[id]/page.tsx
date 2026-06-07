@@ -4,17 +4,24 @@ import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import { notFound, useParams, useRouter, useSearchParams } from "next/navigation";
 import Navbar from "@/components/layout/Navbar";
-import { users } from "@/data/users";
+// Mock kullanici listesi kaldirildi; diger kullanicilar DB aramasindan cekiliyor.
+// import { users } from "@/data/users";
+import { searchUsers } from "@/lib/auth-api";
+import { searchUserToUser } from "@/lib/profile-mapper";
+import type { User } from "@/types";
 import {
   MOCK_PROFILE_EVENT,
+  defaultEditableProfile,
   formatProfileLinkValue,
   normalizeProfileLinkHref,
   profileToUser,
   readProfileDraft,
-  readPublishedProfile,
   type EditableProfileLink,
 } from "@/lib/mock-profile";
 import { useConnectedUsersState } from "@/lib/mock-social";
+import { getMe } from "@/lib/auth-api";
+import { currentUserToEditable, emptyEditableProfile } from "@/lib/profile-mapper";
+import { isApiErrorResponse } from "@/types/auth";
 
 function slugify(name: string) {
   return name
@@ -37,28 +44,29 @@ function getUserAvatarStyle(avatarImage?: string | null) {
 
 type Tab = "about" | "skills" | "links";
 
-const otherUserLinks = [
-  { href: "https://studio.example", value: "studio.example", label: "Portfolyo" },
-  { href: "https://instagram.com/illustration", value: "@illustration", label: "Instagram" },
-  { href: "https://dribbble.com/handle", value: "dribbble.com/handle", label: "Dribbble" },
-  { href: "mailto:hello@studio.example", value: "hello@studio.example", label: "E-posta" },
-];
+// Diger kullanicilar icin sahte baglanti verisi kaldirildi (DB'de karsiligi yok).
+// const otherUserLinks = [
+//   { href: "https://studio.example", value: "studio.example", label: "Portfolyo" },
+//   { href: "https://instagram.com/illustration", value: "@illustration", label: "Instagram" },
+//   { href: "https://dribbble.com/handle", value: "dribbble.com/handle", label: "Dribbble" },
+//   { href: "mailto:hello@studio.example", value: "hello@studio.example", label: "E-posta" },
+// ];
 
-function buildRelatedUsers(currentId: string, role: string, location: string) {
+function buildRelatedUsers(pool: User[], currentId: string, role: string, location: string) {
   const roleToken = role
     .toLocaleLowerCase("tr-TR")
     .split(/[ /,-]+/)
     .find((token) => token.length > 3);
 
-  const sameCity = users.filter((item) => item.id !== currentId && item.location === location);
-  const sameRole = users.filter(
+  const sameCity = pool.filter((item) => item.id !== currentId && item.location === location);
+  const sameRole = pool.filter(
     (item) =>
       item.id !== currentId &&
       roleToken &&
       item.role.toLocaleLowerCase("tr-TR").includes(roleToken)
   );
 
-  const ordered = [...sameCity, ...sameRole, ...users.filter((item) => item.id !== currentId)];
+  const ordered = [...sameCity, ...sameRole, ...pool.filter((item) => item.id !== currentId)];
   return ordered.filter((item, index) => ordered.findIndex((entry) => entry.id === item.id) === index).slice(0, 3);
 }
 
@@ -68,56 +76,104 @@ export default function ProfileDetailPage() {
   const searchParams = useSearchParams();
   const previewMode = searchParams.get("preview") === "1";
 
+  const isMe = params?.id === "me";
+
   const [activeTab, setActiveTab] = useState<Tab>("about");
   const [savedMessage, setSavedMessage] = useState("");
   const [currentProfile, setCurrentProfile] = useState(() =>
-    previewMode ? readProfileDraft() : readPublishedProfile()
+    previewMode ? readProfileDraft() : emptyEditableProfile
   );
+  const [otherUsers, setOtherUsers] = useState<User[]>([]);
+  const [othersLoaded, setOthersLoaded] = useState(false);
 
   const { connectedUserIds, toggleConnectedUserId } = useConnectedUsersState();
+
+  // Diger kullanicilar (goruntulenen profil + benzer kisiler) DB'den cekiliyor.
+  useEffect(() => {
+    let cancelled = false;
+
+    (async () => {
+      const resp = await searchUsers({ limit: 50 });
+      if (cancelled) return;
+      if (!isApiErrorResponse(resp)) {
+        setOtherUsers(resp.users.map(searchUserToUser));
+      }
+      setOthersLoaded(true);
+    })();
+
+    return () => {
+      cancelled = true;
+    };
+  }, []);
 
   useEffect(() => {
     if (typeof window === "undefined") return;
 
-    const syncProfile = () => {
-      setCurrentProfile(previewMode ? readProfileDraft() : readPublishedProfile());
-    };
+    // Preview mode renders the unpublished draft straight from localStorage.
+    if (previewMode) {
+      const syncProfile = () => setCurrentProfile(readProfileDraft());
+      syncProfile();
+      window.addEventListener("storage", syncProfile);
+      window.addEventListener(MOCK_PROFILE_EVENT, syncProfile);
 
-    syncProfile();
-    window.addEventListener("storage", syncProfile);
-    window.addEventListener(MOCK_PROFILE_EVENT, syncProfile);
+      return () => {
+        window.removeEventListener("storage", syncProfile);
+        window.removeEventListener(MOCK_PROFILE_EVENT, syncProfile);
+      };
+    }
+
+    // The own profile ("me") is loaded from the backend; numeric ids stay mock.
+    if (!isMe) return;
+
+    let cancelled = false;
+    (async () => {
+      const resp = await getMe();
+      if (cancelled) return;
+      if (!isApiErrorResponse(resp)) {
+        setCurrentProfile(currentUserToEditable(resp.user));
+      } else {
+        // Misafir: kendi profili yok, ornek kullaniciyi (Ayse Yilmaz) onizle.
+        setCurrentProfile(defaultEditableProfile);
+      }
+    })();
 
     return () => {
-      window.removeEventListener("storage", syncProfile);
-      window.removeEventListener(MOCK_PROFILE_EVENT, syncProfile);
+      cancelled = true;
     };
-  }, [previewMode]);
+  }, [previewMode, isMe]);
 
   const currentUser = profileToUser(currentProfile);
-  const allUsers = [currentUser, ...users];
+  const allUsers = [currentUser, ...otherUsers];
   const user = allUsers.find((item) => item.id === params?.id);
 
   if (!user) {
+    // DB listesi henuz gelmediyse notFound tetiklemeden bekle.
+    if (!isMe && !othersLoaded) {
+      return (
+        <div className="wrap pd-wrap">
+          <Navbar activePath="/profil/duzenle" />
+          <div className="pd-topbar">Yukleniyor...</div>
+        </div>
+      );
+    }
     notFound();
   }
 
   const isCurrentUser = user.id === "me";
   const slug = isCurrentUser ? currentProfile.username : slugify(user.name);
   const isConnected = connectedUserIds.includes(user.id);
-  const relatedUsers = isCurrentUser ? users.slice(0, 3) : buildRelatedUsers(user.id, user.role, user.location);
+  const relatedUsers = isCurrentUser
+    ? otherUsers.slice(0, 3)
+    : buildRelatedUsers(otherUsers, user.id, user.role, user.location);
 
   const profileLinks: EditableProfileLink[] = isCurrentUser
     ? currentProfile.links.filter((link) => link.value.trim())
-    : otherUserLinks.map((link, index) => ({
-        id: `other-${index}`,
-        type: link.label,
-        value: link.href,
-      }));
+    : [];
 
   const detailLinks = profileLinks.map((link, index) => ({
     id: link.id || `detail-${index}`,
-    href: isCurrentUser ? normalizeProfileLinkHref(link) : link.value,
-    value: isCurrentUser ? formatProfileLinkValue(link) : otherUserLinks[index]?.value ?? link.value,
+    href: normalizeProfileLinkHref(link),
+    value: formatProfileLinkValue(link),
     label: link.type,
   }));
 

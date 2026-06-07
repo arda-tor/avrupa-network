@@ -1,20 +1,42 @@
 "use client";
 
 import Link from "next/link";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import Footer from "@/components/layout/Footer";
 import Navbar from "@/components/layout/Navbar";
-import { users } from "@/data/users";
+// Mock kullanici listesi kaldirildi; kullanicilar DB aramasindan cekiliyor.
+// import { users } from "@/data/users";
+import { searchUsers } from "@/lib/auth-api";
+import { searchUserToUser } from "@/lib/profile-mapper";
 import { removeUserFromNetwork, useConnectedUsersState, useSavedUsersState } from "@/lib/mock-social";
+import { isApiErrorResponse } from "@/types/auth";
+import type { User } from "@/types";
 
 export default function Agim() {
   const [query, setQuery] = useState("");
+  const [allUsers, setAllUsers] = useState<User[]>([]);
   const { savedUserIds } = useSavedUsersState();
   const { connectedUserIds } = useConnectedUsersState();
 
+  useEffect(() => {
+    let cancelled = false;
+
+    (async () => {
+      const resp = await searchUsers({ limit: 50 });
+      if (cancelled) return;
+      if (!isApiErrorResponse(resp)) {
+        setAllUsers(resp.users.map(searchUserToUser));
+      }
+    })();
+
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
   const savedUsers = useMemo(
-    () => users.filter((user) => savedUserIds.includes(user.id)),
-    [savedUserIds]
+    () => allUsers.filter((user) => savedUserIds.includes(user.id)),
+    [allUsers, savedUserIds]
   );
 
   const filteredUsers = useMemo(() => {

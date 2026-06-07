@@ -1,13 +1,21 @@
 "use client";
 
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useState } from "react";
 import Navbar from "@/components/layout/Navbar";
+import { getMe, register } from "@/lib/auth-api";
+import { useAuth } from "@/store/auth";
+import { ApiErrorResponse, isApiErrorResponse } from "@/types/auth";
 
 export default function RegisterPage() {
+  const { setUserState } = useAuth();
+  const router = useRouter();
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [error, setError] = useState<ApiErrorResponse>();
+  const [loading, setLoading] = useState(false);
 
   return (
     <div className="mx-auto min-h-screen max-w-[1440px] px-5 md:px-10">
@@ -71,10 +79,33 @@ export default function RegisterPage() {
 
           <form
             className="flex flex-col gap-4"
-            onSubmit={(event) => {
+            onSubmit={async (event) => {
               event.preventDefault();
+              setError(undefined);
+              setLoading(true);
 
-              // TODO: Burada getCsrf() ve register() akisini baglayacaksin.
+              try {
+                const registerResp = await register({
+                  fullName: name,
+                  email,
+                  password,
+                });
+                if (isApiErrorResponse(registerResp)) {
+                  setError(registerResp);
+                  return;
+                }
+
+                const resp = await getMe();
+                if (isApiErrorResponse(resp)) {
+                  setError(resp);
+                  return;
+                }
+
+                setUserState(resp.user);
+                router.push("/");
+              } finally {
+                setLoading(false);
+              }
             }}
           >
             <label className="flex flex-col gap-2">
@@ -120,16 +151,22 @@ export default function RegisterPage() {
               />
             </label>
 
-            <div className="rounded-xl border border-dashed border-line/25 bg-bg-2/60 px-4 py-3 text-[13px] text-ink-soft">
-              Request body, backend hata mesaji ve success akisi burada
-              islenecek.
-            </div>
+            {error ? (
+              <div className="rounded-xl border border-[#E11D48]/25 bg-[#E11D48]/5 px-4 py-3 text-[13px] text-[#E11D48]">
+                {error?.error?.message ?? "Kayit sirasinda bir hata olustu."}
+              </div>
+            ) : (
+              <div className="rounded-xl border border-dashed border-line/25 bg-bg-2/60 px-4 py-3 text-[13px] text-ink-soft">
+                Backend hatasi olursa mesaji burada goreceksin.
+              </div>
+            )}
 
             <button
               type="submit"
-              className="mt-1 min-h-12 rounded-full bg-accent px-5 text-sm font-semibold text-white transition hover:bg-ink"
+              disabled={loading}
+              className="mt-1 min-h-12 rounded-full bg-accent px-5 text-sm font-semibold text-white transition hover:bg-ink disabled:cursor-not-allowed disabled:opacity-70"
             >
-              Register
+              {loading ? "Kayit olusturuluyor..." : "Register"}
             </button>
           </form>
 

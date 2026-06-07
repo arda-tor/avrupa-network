@@ -1,5 +1,7 @@
 import { useEffect, useState } from "react";
-import { savedUserIds as defaultSavedUserIds } from "@/data/users";
+// Mock varsayilan kayitli kullanicilar kaldirildi; baslangic bos liste.
+// import { savedUserIds as defaultSavedUserIds } from "@/data/users";
+const defaultSavedUserIds: string[] = [];
 
 export const MOCK_SOCIAL_EVENT = "nexus-social-change";
 

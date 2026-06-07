@@ -11,14 +11,16 @@ import {
   getProfileSummarySkills,
   normalizeProfileLinkHref,
   profileToUser,
-  publishProfile,
-  readProfileDraft,
-  readPublishedProfile,
-  resetDraftToPublished,
   writeProfileDraft,
   type EditableProfile,
 } from "@/lib/mock-profile";
+import { deleteAccount, getMe, updateProfile as updateProfileRequest } from "@/lib/auth-api";
+import { currentUserToEditable, editableToUpdateFields, emptyEditableProfile } from "@/lib/profile-mapper";
+import { useAuth } from "@/store/auth";
+import { isApiErrorResponse } from "@/types/auth";
 import type { AvatarVariant } from "@/types";
+
+const MAX_AVATAR_BYTES = 500 * 1024;
 
 const avatarVariants: AvatarVariant[] = ["a1", "a2", "a3", "a4", "a5", "a6"];
 const toneOptions = ["Profesyonel", "Arkadas canlisi", "Minimal", "Hikaye odakli"];
@@ -109,17 +111,48 @@ function getChangedSectionCount(profile: EditableProfile, publishedProfile: Edit
 
 export default function ProfilDuzenle() {
   const router = useRouter();
+  const clearUser = useAuth((state) => state.logout);
+  const setUserState = useAuth((state) => state.setUserState);
   const fileInputRef = useRef<HTMLInputElement | null>(null);
 
-  const [profile, setProfile] = useState<EditableProfile>(readProfileDraft());
-  const [publishedProfile, setPublishedProfile] = useState<EditableProfile>(readPublishedProfile());
+  const [profile, setProfile] = useState<EditableProfile>(emptyEditableProfile);
+  const [publishedProfile, setPublishedProfile] = useState<EditableProfile>(emptyEditableProfile);
   const [skillInput, setSkillInput] = useState("");
   const [previewMode, setPreviewMode] = useState<"card" | "full">("card");
   const [flashMessage, setFlashMessage] = useState("");
+  const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
 
+  // Load the live profile from the backend as the source of truth.
   useEffect(() => {
+    let cancelled = false;
+
+    (async () => {
+      const resp = await getMe();
+      if (cancelled) return;
+
+      if (isApiErrorResponse(resp)) {
+        router.push("/giris");
+        return;
+      }
+
+      const editable = currentUserToEditable(resp.user);
+      setProfile(editable);
+      setPublishedProfile(editable);
+      writeProfileDraft(editable);
+      setLoading(false);
+    })();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [router]);
+
+  // Mirror the working draft into localStorage so the "Onizle" route can render it.
+  useEffect(() => {
+    if (loading) return;
     writeProfileDraft(profile);
-  }, [profile]);
+  }, [profile, loading]);
 
   useEffect(() => {
     if (!flashMessage) return;
@@ -137,6 +170,20 @@ export default function ProfilDuzenle() {
   const previewUser = profileToUser(profile);
   const previewLinks = profile.links.filter((link) => link.value.trim());
   const summarySkills = getProfileSummarySkills(profile, 3);
+
+  if (loading) {
+    return (
+      <div className="wrap">
+        <Navbar activePath="/profil/duzenle" />
+        <div className="page-head">
+          <div>
+            <h1>Profil yukleniyor...</h1>
+            <p>Bilgilerin backend&apos;den getiriliyor.</p>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   const updateProfile = <K extends keyof EditableProfile>(key: K, value: EditableProfile[K]) => {
     setProfile((current) => ({ ...current, [key]: value }));
@@ -190,17 +237,47 @@ export default function ProfilDuzenle() {
     updateProfile("avatarImage", null);
   };
 
-  const handlePublish = () => {
-    publishProfile(profile);
-    setPublishedProfile(profile);
-    setFlashMessage("Degisiklikler yayinlandi.");
+  const handlePublish = async () => {
+    if (saving) return;
+    setSaving(true);
+
+    try {
+      const resp = await updateProfileRequest(editableToUpdateFields(profile));
+      if (isApiErrorResponse(resp)) {
+        setFlashMessage(resp.error?.message ?? "Profil kaydedilemedi.");
+        return;
+      }
+
+      const editable = currentUserToEditable(resp.user);
+      setProfile(editable);
+      setPublishedProfile(editable);
+      writeProfileDraft(editable);
+      setUserState(resp.user);
+      setFlashMessage("Degisiklikler yayinlandi.");
+    } finally {
+      setSaving(false);
+    }
   };
 
   const handleReset = () => {
-    const resetProfile = resetDraftToPublished();
-    setProfile(resetProfile);
-    setPublishedProfile(readPublishedProfile());
+    setProfile(publishedProfile);
+    writeProfileDraft(publishedProfile);
     setFlashMessage("Taslak son yayinlanan surume donduruldu.");
+  };
+
+  const handleDeleteAccount = async () => {
+    if (!window.confirm("Hesabin kalici olarak silinecek. Bu islem geri alinamaz. Devam edilsin mi?")) {
+      return;
+    }
+
+    const resp = await deleteAccount();
+    if (isApiErrorResponse(resp)) {
+      setFlashMessage(resp.error?.message ?? "Hesap silinemedi.");
+      return;
+    }
+
+    clearUser();
+    router.push("/giris");
   };
 
   const handlePreview = () => {
@@ -232,7 +309,7 @@ export default function ProfilDuzenle() {
         </div>
         <div className="head-actions">
           <button type="button" className="btn-secondary" onClick={handlePreview}>Onizle</button>
-          <button type="button" className="btn-primary" onClick={handlePublish}>Degisiklikleri Yayinla →</button>
+          <button type="button" className="btn-primary" onClick={handlePublish} disabled={saving}>{saving ? "Yayinlaniyor..." : "Degisiklikleri Yayinla →"}</button>
         </div>
       </div>
 
@@ -281,6 +358,12 @@ export default function ProfilDuzenle() {
                   onChange={(event) => {
                     const file = event.target.files?.[0];
                     if (!file) return;
+
+                    if (file.size > MAX_AVATAR_BYTES) {
+                      setFlashMessage("Fotograf 500KB'dan kucuk olmali (su an base64 olarak saklaniyor).");
+                      event.target.value = "";
+                      return;
+                    }
 
                     const reader = new FileReader();
                     reader.onload = () => {
@@ -508,8 +591,8 @@ export default function ProfilDuzenle() {
             <div className="danger-title">Tehlikeli bolge</div>
             <p className="danger-desc">Hesabini dondurursan profilin gecici olarak gizlenir. Silme islemi geri alinamaz.</p>
             <div className="danger-actions">
-              <button type="button" className="btn-danger" onClick={() => setFlashMessage("Hesabi dondurma akisi backend baglandiginda aktif olacak.")}>Hesabi Dondur</button>
-              <button type="button" className="btn-danger" onClick={() => setFlashMessage("Kalici silme akisi backend baglandiginda aktif olacak.")}>Hesabi Kalici Olarak Sil</button>
+              <button type="button" className="btn-danger" onClick={() => setFlashMessage("Hesabi dondurma akisi henuz backend tarafinda yok.")}>Hesabi Dondur</button>
+              <button type="button" className="btn-danger" onClick={handleDeleteAccount}>Hesabi Kalici Olarak Sil</button>
             </div>
           </div>
 
@@ -520,7 +603,7 @@ export default function ProfilDuzenle() {
             </div>
             <div className="bar-actions">
               <button type="button" className="bar-cancel" onClick={handleReset}>Vazgec</button>
-              <button type="button" className="bar-save" onClick={handlePublish}>Yayinla →</button>
+              <button type="button" className="bar-save" onClick={handlePublish} disabled={saving}>{saving ? "Yayinlaniyor..." : "Yayinla →"}</button>
             </div>
           </div>
         </main>

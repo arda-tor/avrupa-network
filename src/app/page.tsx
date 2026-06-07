@@ -11,13 +11,15 @@ import ProfileCard from "@/components/hero/ProfileCard";
 import Footer from "@/components/layout/Footer";
 import Navbar from "@/components/layout/Navbar";
 import HomeSkeleton from "@/components/ui/HomeSkeleton";
-import { filters, users } from "@/data/users";
+import { filters } from "@/data/users";
+import { searchUsers } from "@/lib/auth-api";
+import { currentUserToEditable, searchUserToUser } from "@/lib/profile-mapper";
+import type { User } from "@/types";
 import {
-  MOCK_PROFILE_EVENT,
+  defaultEditableProfile,
   getProfileInitial,
   getProfileName,
   getProfileSummarySkills,
-  readPublishedProfile,
   type EditableProfile,
 } from "@/lib/mock-profile";
 import { useConnectedUsersState } from "@/lib/mock-social";
@@ -67,36 +69,56 @@ function getAvatarStyle(profile: EditableProfile) {
 export default function Home() {
   const { user, setUserState, loading, setLoading } = useAuth();
   const router = useRouter();
-  const [profile, setProfile] = useState<EditableProfile>(readPublishedProfile());
+  const [profile, setProfile] = useState<EditableProfile>(defaultEditableProfile);
   const [activeFilter, setActiveFilter] = useState("all");
   const [searchQuery, setSearchQuery] = useState("");
+  const [dbUsers, setDbUsers] = useState<User[]>([]);
   const { connectedUserIds, toggleConnectedUserId } = useConnectedUsersState();
+
+  // Kesfet akisi artik DB'den (kullanici aramasi) besleniyor.
+  useEffect(() => {
+    let cancelled = false;
+
+    (async () => {
+      const resp = await searchUsers({ limit: 50 });
+      if (cancelled) return;
+      if (!isApiErrorResponse(resp)) {
+        // Kesfette hesaplar rastgele sirada gorunsun.
+        const mapped = resp.users.map(searchUserToUser);
+        for (let i = mapped.length - 1; i > 0; i--) {
+          const j = Math.floor(Math.random() * (i + 1));
+          [mapped[i], mapped[j]] = [mapped[j], mapped[i]];
+        }
+        setDbUsers(mapped);
+      }
+    })();
+
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  // Hero karti: misafir -> ornek kullanici (Ayse Yilmaz), giris -> kendi verisi.
+  useEffect(() => {
+    setProfile(user ? currentUserToEditable(user) : defaultEditableProfile);
+  }, [user]);
 
   useEffect(() => {
     if (typeof window === "undefined") return;
 
-    const syncProfile = () => {
-      setProfile(readPublishedProfile());
-    };
-
-    syncProfile();
-    window.addEventListener("storage", syncProfile);
-    window.addEventListener(MOCK_PROFILE_EVENT, syncProfile);
-
     if (!user) {
       setLoading(true);
 
+      // Kesfet herkese acik: oturum yoksa login'e zorlamiyoruz, sadece
+      // oturum varsa store'u dolduruyoruz. Misafir kullanici sayfayi gorur.
       getMe()
         .then((me) => {
-          if (isApiErrorResponse(me) || !me?.user) {
-            router.push("/giris");
-            return;
+          if (!isApiErrorResponse(me) && me?.user) {
+            setUserState(me.user);
           }
-
-          setUserState(me.user);
         })
         .catch(() => {
-          router.push("/giris");
+          // Misafir olarak devam et.
         })
         .finally(() => {
           setLoading(false);
@@ -104,16 +126,11 @@ export default function Home() {
     } else {
       setLoading(false);
     }
-
-    return () => {
-      window.removeEventListener("storage", syncProfile);
-      window.removeEventListener(MOCK_PROFILE_EVENT, syncProfile);
-    };
   }, []);
 
   const visibleUsers = useMemo(
-    () => users.filter((user) => matchesUserFilter(user.id, user.role, user.location, activeFilter, profile.location)),
-    [activeFilter, profile.location]
+    () => dbUsers.filter((user) => matchesUserFilter(user.id, user.role, user.location, activeFilter, profile.location)),
+    [dbUsers, activeFilter, profile.location]
   );
 
   const spotlightUser = visibleUsers.find((user) => user.spotlight);

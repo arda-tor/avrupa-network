@@ -3,8 +3,11 @@
 import React, { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import Navbar from "@/components/layout/Navbar";
-import { users } from "@/data/users";
+import { searchUsers } from "@/lib/auth-api";
+import { searchUserToUser } from "@/lib/profile-mapper";
 import { useConnectedUsersState } from "@/lib/mock-social";
+import { isApiErrorResponse } from "@/types/auth";
+import type { User } from "@/types";
 
 const categories = [
   { id: "design", label: "Tasarim", count: 412 },
@@ -59,6 +62,8 @@ export default function SearchPage() {
   const [activeCities, setActiveCities] = useState<string[]>([]);
   const [sortBy, setSortBy] = useState("name");
   const [visibleCount, setVisibleCount] = useState(6);
+  const [fetchedUsers, setFetchedUsers] = useState<User[]>([]);
+  const [searchError, setSearchError] = useState("");
 
   useEffect(() => {
     if (typeof window === "undefined") return;
@@ -71,22 +76,38 @@ export default function SearchPage() {
     setVisibleCount(6);
   }, [query, activeCats, activeCities, sortBy]);
 
-  const filteredUsers = useMemo(() => {
-    const normalizedQuery = query.trim().toLowerCase();
+  // Debounced backend search: free text -> name, first selected city -> city.
+  // Category filtering stays client-side (no matching backend field).
+  useEffect(() => {
+    let cancelled = false;
 
-    return users
+    const timeout = window.setTimeout(async () => {
+      const resp = await searchUsers({
+        name: query.trim() || undefined,
+        city: activeCities[0],
+        limit: 50,
+      });
+      if (cancelled) return;
+
+      if (isApiErrorResponse(resp)) {
+        setSearchError(resp.error?.message ?? "Arama yapilamadi.");
+        setFetchedUsers([]);
+      } else {
+        setSearchError("");
+        setFetchedUsers(resp.users.map(searchUserToUser));
+      }
+    }, 300);
+
+    return () => {
+      cancelled = true;
+      window.clearTimeout(timeout);
+    };
+  }, [query, activeCities]);
+
+  const filteredUsers = useMemo(() => {
+    return fetchedUsers
       .filter((user) => {
         if (activeCats.length > 0 && !activeCats.some((cat) => matchesCategory(user.role, cat))) return false;
-        if (activeCities.length > 0 && !activeCities.includes(user.location)) return false;
-
-        if (normalizedQuery) {
-          const searchableValue = [user.name, user.role, user.location, user.bio, ...user.skills]
-            .join(" ")
-            .toLowerCase();
-
-          if (!searchableValue.includes(normalizedQuery)) return false;
-        }
-
         return true;
       })
       .sort((firstUser, secondUser) => {
@@ -94,7 +115,7 @@ export default function SearchPage() {
         if (sortBy === "city") return firstUser.location.localeCompare(secondUser.location);
         return 0;
       });
-  }, [query, activeCats, activeCities, sortBy]);
+  }, [fetchedUsers, activeCats, sortBy]);
 
   const displayedUsers = filteredUsers.slice(0, visibleCount);
 
@@ -166,6 +187,7 @@ export default function SearchPage() {
             <div className="sh-results-count">
               <b>{filteredUsers.length}</b> sonuc
               {query ? <span className="sh-results-q"> • &ldquo;{query}&rdquo;</span> : null}
+              {searchError ? <span className="sh-results-q"> • {searchError}</span> : null}
             </div>
             <div className="sh-results-controls">
               <input

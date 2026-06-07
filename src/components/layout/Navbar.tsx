@@ -2,7 +2,9 @@
 
 import type { ReactNode } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { cn } from "@/lib/utils";
+import { logout as logoutRequest } from "@/lib/auth-api";
 import { useAuth } from "@/store/auth";
 
 interface NavbarProps {
@@ -20,6 +22,15 @@ const navItems = [
 
 export default function Navbar({ activePath, rightContent, rightClassName = "nav-actions" }: NavbarProps) {
   const user = useAuth((state) => state.user);
+  const clearUser = useAuth((state) => state.logout);
+  const router = useRouter();
+
+  const handleLogout = async () => {
+    await logoutRequest();
+    clearUser();
+    router.push("/giris");
+  };
+
   return (
     <nav>
       <div className="logo">
@@ -44,12 +55,13 @@ export default function Navbar({ activePath, rightContent, rightClassName = "nav
                 >
                   {user.fullName}
                 </span>
-                <Link
-                  href="/cikis"
+                <button
+                  type="button"
+                  onClick={handleLogout}
                   className="inline-flex min-h-10 items-center justify-center rounded-full border border-transparent px-4 text-[13px] font-semibold text-ink transition hover:border-line hover:bg-bg-2"
                 >
                   Çıkış
-                </Link>
+                </button>
               </div>
             ) : (
               <>
