@@ -1,0 +1,15 @@
+node_modules
+.next
+.git
+.gitignore
+# Tum env dosyalari haric tutulur: lokal .env.local (localhost) prod build'e sizmasin.
+.env
+.env.*
+npm-debug.log*
+pnpm-debug.log*
+Dockerfile*
+.dockerignore
+README.md
+.codex-dev.log
+tsconfig.tsbuildinfo
+.claude
