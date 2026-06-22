@@ -57,24 +57,16 @@ function ConnectButton({ userId }: { userId: string }) {
 }
 
 export default function SearchPage() {
-  const [query, setQuery] = useState("");
+  const [query, setQuery] = useState(() => {
+    if (typeof window === "undefined") return "";
+    return new URLSearchParams(window.location.search).get("q") ?? "";
+  });
   const [activeCats, setActiveCats] = useState<string[]>([]);
   const [activeCities, setActiveCities] = useState<string[]>([]);
   const [sortBy, setSortBy] = useState("name");
   const [visibleCount, setVisibleCount] = useState(6);
   const [fetchedUsers, setFetchedUsers] = useState<User[]>([]);
   const [searchError, setSearchError] = useState("");
-
-  useEffect(() => {
-    if (typeof window === "undefined") return;
-
-    const initialQuery = new URLSearchParams(window.location.search).get("q") ?? "";
-    setQuery(initialQuery);
-  }, []);
-
-  useEffect(() => {
-    setVisibleCount(6);
-  }, [query, activeCats, activeCities, sortBy]);
 
   // Debounced backend search: free text -> name, first selected city -> city.
   // Category filtering stays client-side (no matching backend field).
@@ -122,11 +114,17 @@ export default function SearchPage() {
   const activeChips = [
     ...activeCats.map((cat) => ({
       label: categories.find((category) => category.id === cat)?.label ?? cat,
-      remove: () => setActiveCats((current) => current.filter((value) => value !== cat)),
+      remove: () => {
+        setActiveCats((current) => current.filter((value) => value !== cat));
+        setVisibleCount(6);
+      },
     })),
     ...activeCities.map((city) => ({
       label: city,
-      remove: () => setActiveCities((current) => current.filter((value) => value !== city)),
+      remove: () => {
+        setActiveCities((current) => current.filter((value) => value !== city));
+        setVisibleCount(6);
+      },
     })),
   ];
 
@@ -135,6 +133,7 @@ export default function SearchPage() {
     setActiveCats([]);
     setActiveCities([]);
     setSortBy("name");
+    setVisibleCount(6);
   };
 
   return (
@@ -147,14 +146,25 @@ export default function SearchPage() {
             <div className="sh-fhead">
               Kategori
               {activeCats.length > 0 ? (
-                <span className="sh-fclear" onClick={() => setActiveCats([])}>temizle</span>
+                <span
+                  className="sh-fclear"
+                  onClick={() => {
+                    setActiveCats([]);
+                    setVisibleCount(6);
+                  }}
+                >
+                  temizle
+                </span>
               ) : null}
             </div>
             {categories.map((category) => (
               <label
                 key={category.id}
                 className={`sh-check-item${activeCats.includes(category.id) ? " on" : ""}`}
-                onClick={() => setActiveCats((current) => toggle(current, category.id))}
+                onClick={() => {
+                  setActiveCats((current) => toggle(current, category.id));
+                  setVisibleCount(6);
+                }}
               >
                 <span className="sh-check" />
                 {category.label}
@@ -171,7 +181,10 @@ export default function SearchPage() {
                   type="button"
                   key={city}
                   className={`sh-pill${activeCities.includes(city) ? " on" : ""}`}
-                  onClick={() => setActiveCities((current) => toggle(current, city))}
+                  onClick={() => {
+                    setActiveCities((current) => toggle(current, city));
+                    setVisibleCount(6);
+                  }}
                 >
                   {city}
                 </button>
@@ -195,14 +208,20 @@ export default function SearchPage() {
                 className="search"
                 placeholder="Isim, yetenek, rol veya sehir ara..."
                 value={query}
-                onChange={(event) => setQuery(event.target.value)}
+                onChange={(event) => {
+                  setQuery(event.target.value);
+                  setVisibleCount(6);
+                }}
               />
               <div className="sh-sort">
                 <span className="sh-sort-label">Sirala:</span>
                 <select
                   aria-label="Siralama"
                   value={sortBy}
-                  onChange={(event) => setSortBy(event.target.value)}
+                  onChange={(event) => {
+                    setSortBy(event.target.value);
+                    setVisibleCount(6);
+                  }}
                   className="sh-sort-select"
                 >
                   <option value="name">Alfabetik</option>

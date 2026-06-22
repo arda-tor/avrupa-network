@@ -69,7 +69,10 @@ function getAvatarStyle(profile: EditableProfile) {
 export default function Home() {
   const { user, setUserState, loading, setLoading } = useAuth();
   const router = useRouter();
-  const [profile, setProfile] = useState<EditableProfile>(defaultEditableProfile);
+  const profile = useMemo(
+    () => (user ? currentUserToEditable(user) : defaultEditableProfile),
+    [user]
+  );
   const [activeFilter, setActiveFilter] = useState("all");
   const [searchQuery, setSearchQuery] = useState("");
   const [dbUsers, setDbUsers] = useState<User[]>([]);
@@ -97,11 +100,6 @@ export default function Home() {
       cancelled = true;
     };
   }, []);
-
-  // Hero karti: misafir -> ornek kullanici (Ayse Yilmaz), giris -> kendi verisi.
-  useEffect(() => {
-    setProfile(user ? currentUserToEditable(user) : defaultEditableProfile);
-  }, [user]);
 
   useEffect(() => {
     if (typeof window === "undefined") return;
