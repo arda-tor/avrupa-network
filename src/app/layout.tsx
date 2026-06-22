@@ -2,8 +2,8 @@ import type { Metadata } from "next";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "Nexus — Yetenek Ağı",
-  description: "Yeteneğini göster, doğru insanları bul.",
+  title: "Turkhub — Avrupa'daki Türk Ağı",
+  description: "Referans ile çalışan, Avrupa başta olmak üzere dünyada yaşayan Türkleri bir araya getiren güvenilir ağ.",
 };
 
 export default function RootLayout({

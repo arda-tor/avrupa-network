@@ -55,6 +55,7 @@ export default function Agim() {
     <div className="wrap">
       <Navbar
         activePath="/agim"
+        rightContentRequiresAuth
         rightContent={(
           <input
             type="text"

@@ -178,7 +178,7 @@ export default function ProfilDuzenle() {
         <div className="page-head">
           <div>
             <h1>Profil yukleniyor...</h1>
-            <p>Bilgilerin backend&apos;den getiriliyor.</p>
+            <p>Profilin hazirlaniyor.</p>
           </div>
         </div>
       </div>
@@ -539,7 +539,7 @@ export default function ProfilDuzenle() {
               <span className="num">05</span>
               Bildirimler
             </div>
-            <p className="form-section-desc">Frontend akisinda hangi bildirim kopyalarinin gorunur olacagini sec.</p>
+            <p className="form-section-desc">Almak istedigin bildirimleri sec.</p>
 
             <div className="toggle-row">
               <div className="toggle-info">
@@ -589,9 +589,8 @@ export default function ProfilDuzenle() {
 
           <div className="danger-zone">
             <div className="danger-title">Tehlikeli bolge</div>
-            <p className="danger-desc">Hesabini dondurursan profilin gecici olarak gizlenir. Silme islemi geri alinamaz.</p>
+            <p className="danger-desc">Hesap silme islemi geri alinamaz.</p>
             <div className="danger-actions">
-              <button type="button" className="btn-danger" onClick={() => setFlashMessage("Hesabi dondurma akisi henuz backend tarafinda yok.")}>Hesabi Dondur</button>
               <button type="button" className="btn-danger" onClick={handleDeleteAccount}>Hesabi Kalici Olarak Sil</button>
             </div>
           </div>

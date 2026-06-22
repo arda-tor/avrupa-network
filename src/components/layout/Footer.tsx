@@ -5,7 +5,6 @@ export default function Footer() {
       <div className="foot-dots">
         <span></span><span></span><span></span><span></span>
       </div>
-      <div>v0.4.2 · Yapan: Sen &amp; Biz</div>
     </div>
   );
 }

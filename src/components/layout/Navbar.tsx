@@ -10,17 +10,23 @@ import { useAuth } from "@/store/auth";
 interface NavbarProps {
   activePath?: string;
   rightContent?: ReactNode;
+  rightContentRequiresAuth?: boolean;
   rightClassName?: string;
 }
 
 const navItems = [
-  { href: "/", label: "Kesfet" },
+  { href: "/", label: "Ana Sayfa" },
   { href: "/ara", label: "Ara" },
-  { href: "/agim", label: "Favorilerim" },
+  { href: "/agim", label: "Favorilerim", requiresAuth: true },
   { href: "/profil/duzenle", label: "Profilim" },
 ];
 
-export default function Navbar({ activePath, rightContent, rightClassName = "nav-actions" }: NavbarProps) {
+export default function Navbar({
+  activePath,
+  rightContent,
+  rightContentRequiresAuth = false,
+  rightClassName = "nav-actions",
+}: NavbarProps) {
   const user = useAuth((state) => state.user);
   const clearUser = useAuth((state) => state.logout);
   const router = useRouter();
@@ -34,18 +40,18 @@ export default function Navbar({ activePath, rightContent, rightClassName = "nav
   return (
     <nav>
       <div className="logo">
-        <div className="logo-mark">N</div>
-        Nexus
+        <div className="logo-mark">T</div>
+        Turkhub
       </div>
       <div className="nav-links">
-        {navItems.map((item) => (
+        {navItems.filter((item) => !item.requiresAuth || user).map((item) => (
           <Link key={item.href} href={item.href} className={activePath === item.href ? "active" : undefined}>
             {item.label}
           </Link>
         ))}
       </div>
       <div className={cn(rightClassName)}>
-        {rightContent}
+        {!rightContentRequiresAuth || user ? rightContent : null}
         <div className="flex items-center gap-2">
           {
             user ? (

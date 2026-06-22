@@ -24,7 +24,7 @@ export default function LoginPage() {
         <div className="animate-[fadeUp_.8s_cubic-bezier(.2,.7,.2,1)_both] md:pt-6">
           <div className="mb-6 inline-flex items-center gap-2 font-mono text-[11px] uppercase tracking-[0.15em] text-mute">
             <span className="h-1.5 w-1.5 rounded-full bg-accent" />
-            Login akisi hazir
+            Tekrar hos geldin
           </div>
 
           <h1 className="font-serif text-[clamp(52px,7vw,92px)] font-normal leading-[0.95] tracking-[-0.035em] text-ink">
@@ -32,20 +32,9 @@ export default function LoginPage() {
           </h1>
 
           <p className="mt-6 max-w-xl text-[17px] leading-[1.5] text-ink-soft">
-            Tasarim ayni kalsin diye ekran iskeleti geri geldi. Bu kez form
-            gercek backend login akisina baglandi; cookie session ve CSRF
-            akisi arka planda calisiyor.
+            Hesabina erismek ve baglantilarina kaldigin yerden devam etmek
+            icin giris yap.
           </p>
-
-          <div className="mt-8 max-w-lg rounded-[20px] border border-dashed border-line/30 bg-card/70 p-5">
-            <p className="font-mono text-[10px] uppercase tracking-[0.18em] text-mute">
-              Backend Notu
-            </p>
-            <p className="mt-3 text-sm leading-6 text-ink-soft">
-              Giris basarili oldugunda backend session cookie set edecek.
-              Sonraki adimda `me` ve navbar auth state tarafini baglayacagiz.
-            </p>
-          </div>
         </div>
 
         <div className="animate-[fadeUp_.8s_cubic-bezier(.2,.7,.2,1)_both] rounded-[24px] border border-line bg-card p-7 shadow-[0_18px_40px_rgba(26,26,26,.06)]">
@@ -56,24 +45,6 @@ export default function LoginPage() {
             <p className="mt-2 text-sm leading-6 text-ink-soft">
               E-posta ve sifre ile giris deneyebilirsin.
             </p>
-          </div>
-
-          <div className="mb-5 flex flex-col gap-3">
-            <button
-              type="button"
-              className="inline-flex min-h-12 items-center justify-center gap-3 rounded-full border border-[#0A66C2] bg-[#0A66C2] px-5 text-sm font-semibold text-white transition hover:bg-[#004182] hover:border-[#004182]"
-            >
-              <span className="grid h-[22px] w-[22px] place-items-center rounded bg-white text-[13px] font-extrabold tracking-[-0.03em] text-[#0A66C2]">
-                in
-              </span>
-              LinkedIn ile devam et
-            </button>
-          </div>
-
-          <div className="mb-4 flex items-center gap-3 font-mono text-[10px] uppercase tracking-[0.2em] text-mute">
-            <span className="h-px flex-1 bg-line/25" />
-            ya da e-posta ile
-            <span className="h-px flex-1 bg-line/25" />
           </div>
 
           <form
@@ -138,11 +109,7 @@ export default function LoginPage() {
               <div className="rounded-xl border border-[#E11D48]/25 bg-[#E11D48]/5 px-4 py-3 text-[13px] text-[#E11D48]">
                 {error!.error!.message}
               </div>
-            ) : (
-              <div className="rounded-xl border border-dashed border-line/25 bg-bg-2/60 px-4 py-3 text-[13px] text-ink-soft">
-                Backend hatasi olursa mesaji burada goreceksin.
-              </div>
-            )}
+            ) : null}
 
             <button
               type="submit"
