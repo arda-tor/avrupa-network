@@ -50,8 +50,8 @@ export default function ProfileCard({
         ))}
       </div>
       <div className="profile-actions">
-        <Link href="/profil/duzenle" className="btn-primary">Profili Duzenle</Link>
-        <Link href={previewHref} className="btn-secondary">Onizle</Link>
+        <Link href="/profil/duzenle" className="btn-primary">Profili Düzenle</Link>
+        <Link href={previewHref} className="btn-secondary">Önizle</Link>
       </div>
     </div>
   );

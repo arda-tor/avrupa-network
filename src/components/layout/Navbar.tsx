@@ -75,13 +75,13 @@ export default function Navbar({
                   href="/giris"
                   className="inline-flex min-h-10 items-center justify-center rounded-full border border-transparent px-4 text-[13px] font-semibold text-ink transition hover:border-line hover:bg-bg-2"
                 >
-                  Login
+                  Giriş yap
                 </Link>
                 <Link
                   href="/kayit"
                   className="inline-flex min-h-10 items-center justify-center rounded-full border border-ink bg-ink px-4 text-[13px] font-semibold text-bg transition hover:border-accent hover:bg-accent"
                 >
-                  Register
+                  Kayıt ol
                 </Link>
               </>
             )

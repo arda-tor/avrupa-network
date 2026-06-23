@@ -10,16 +10,16 @@ import { isApiErrorResponse } from "@/types/auth";
 import type { User } from "@/types";
 
 const categories = [
-  { id: "design", label: "Tasarim", count: 412 },
-  { id: "software", label: "Yazilim", count: 890 },
-  { id: "art", label: "Sanat & Illustrasyon", count: 204 },
-  { id: "writing", label: "Yazarlik", count: 156 },
-  { id: "photo", label: "Fotograf", count: 178 },
-  { id: "music", label: "Muzik & Ses", count: 92 },
-  { id: "data", label: "Veri & Arastirma", count: 143 },
+  { id: "design", label: "Tasarım", count: 412 },
+  { id: "software", label: "Yazılım", count: 890 },
+  { id: "art", label: "Sanat & İllüstrasyon", count: 204 },
+  { id: "writing", label: "Yazarlık", count: 156 },
+  { id: "photo", label: "Fotoğraf", count: 178 },
+  { id: "music", label: "Müzik & Ses", count: 92 },
+  { id: "data", label: "Veri & Araştırma", count: 143 },
 ];
 
-const cityOptions = ["Istanbul", "Ankara", "Izmir", "Bursa", "Berlin", "Londra"];
+const cityOptions = ["İstanbul", "Ankara", "İzmir", "Bursa", "Berlin", "Londra"];
 
 function matchesCategory(role: string, catId: string) {
   const normalizedRole = role.toLowerCase();
@@ -82,7 +82,7 @@ export default function SearchPage() {
       if (cancelled) return;
 
       if (isApiErrorResponse(resp)) {
-        setSearchError(resp.error?.message ?? "Arama yapilamadi.");
+        setSearchError(resp.error?.message ?? "Arama yapılamadı.");
         setFetchedUsers([]);
       } else {
         setSearchError("");
@@ -174,7 +174,7 @@ export default function SearchPage() {
           </div>
 
           <div className="sh-fgroup">
-            <div className="sh-fhead">Sehir</div>
+            <div className="sh-fhead">Şehir</div>
             <div className="sh-pills">
               {cityOptions.map((city) => (
                 <button
@@ -192,13 +192,13 @@ export default function SearchPage() {
             </div>
           </div>
 
-          <button type="button" className="sh-reset" onClick={resetAll}>Tum filtreleri sifirla</button>
+          <button type="button" className="sh-reset" onClick={resetAll}>Tüm filtreleri sıfırla</button>
         </aside>
 
         <main className="sh-results" id="search-results">
           <div className="sh-results-head">
             <div className="sh-results-count">
-              <b>{filteredUsers.length}</b> sonuc
+              <b>{filteredUsers.length}</b> sonuç
               {query ? <span className="sh-results-q"> • &ldquo;{query}&rdquo;</span> : null}
               {searchError ? <span className="sh-results-q"> • {searchError}</span> : null}
             </div>
@@ -206,7 +206,7 @@ export default function SearchPage() {
               <input
                 type="text"
                 className="search"
-                placeholder="Isim, yetenek, rol veya sehir ara..."
+                placeholder="İsim, yetenek, rol veya şehir ara..."
                 value={query}
                 onChange={(event) => {
                   setQuery(event.target.value);
@@ -214,9 +214,9 @@ export default function SearchPage() {
                 }}
               />
               <div className="sh-sort">
-                <span className="sh-sort-label">Sirala:</span>
+                <span className="sh-sort-label">Sırala:</span>
                 <select
-                  aria-label="Siralama"
+                  aria-label="Sıralama"
                   value={sortBy}
                   onChange={(event) => {
                     setSortBy(event.target.value);
@@ -225,7 +225,7 @@ export default function SearchPage() {
                   className="sh-sort-select"
                 >
                   <option value="name">Alfabetik</option>
-                  <option value="city">Sehre gore</option>
+                  <option value="city">Şehre göre</option>
                 </select>
               </div>
             </div>
@@ -280,16 +280,16 @@ export default function SearchPage() {
 
               {visibleCount < filteredUsers.length ? (
                 <button type="button" className="sh-load-more" onClick={() => setVisibleCount((current) => current + 6)}>
-                  Daha fazla goster ↓
+                  Daha fazla göster ↓
                 </button>
               ) : null}
             </>
           ) : (
             <div className="network-empty">
               <div className="network-empty-icon">◌</div>
-              <p>Aramana uygun bir profil bulunamadi.</p>
+              <p>Aramana uygun bir profil bulunamadı.</p>
               <button type="button" className="btn-ghost network-empty-link" onClick={resetAll}>
-                Filtreleri Sifirla
+                Filtreleri Sıfırla
               </button>
             </div>
           )}

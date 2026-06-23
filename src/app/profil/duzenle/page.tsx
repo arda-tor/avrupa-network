@@ -23,8 +23,8 @@ import type { AvatarVariant } from "@/types";
 const MAX_AVATAR_BYTES = 500 * 1024;
 
 const avatarVariants: AvatarVariant[] = ["a1", "a2", "a3", "a4", "a5", "a6"];
-const toneOptions = ["Profesyonel", "Arkadas canlisi", "Minimal", "Hikaye odakli"];
-const keywordOptions = ["Erisilebilirlik", "Fintech", "Tasarim sistemi", "Mentorluk", "Urun stratejisi"];
+const toneOptions = ["Profesyonel", "Arkadaş canlısı", "Minimal", "Hikâye odaklı"];
+const keywordOptions = ["Erişilebilirlik", "Fintech", "Tasarım sistemi", "Mentorluk", "Ürün stratejisi"];
 
 function getAvatarStyle(profile: EditableProfile) {
   if (!profile.avatarImage) return undefined;
@@ -177,8 +177,8 @@ export default function ProfilDuzenle() {
         <Navbar activePath="/profil/duzenle" />
         <div className="page-head">
           <div>
-            <h1>Profil yukleniyor...</h1>
-            <p>Profilin hazirlaniyor.</p>
+            <h1>Profil yükleniyor...</h1>
+            <p>Profilin hazırlanıyor.</p>
           </div>
         </div>
       </div>
@@ -253,7 +253,7 @@ export default function ProfilDuzenle() {
       setPublishedProfile(editable);
       writeProfileDraft(editable);
       setUserState(resp.user);
-      setFlashMessage("Degisiklikler yayinlandi.");
+      setFlashMessage("Değişiklikler yayınlandı.");
     } finally {
       setSaving(false);
     }
@@ -262,11 +262,11 @@ export default function ProfilDuzenle() {
   const handleReset = () => {
     setProfile(publishedProfile);
     writeProfileDraft(publishedProfile);
-    setFlashMessage("Taslak son yayinlanan surume donduruldu.");
+    setFlashMessage("Taslak son yayınlanan sürüme döndürüldü.");
   };
 
   const handleDeleteAccount = async () => {
-    if (!window.confirm("Hesabin kalici olarak silinecek. Bu islem geri alinamaz. Devam edilsin mi?")) {
+    if (!window.confirm("Hesabın kalıcı olarak silinecek. Bu işlem geri alınamaz. Devam edilsin mi?")) {
       return;
     }
 
@@ -290,7 +290,7 @@ export default function ProfilDuzenle() {
       <Navbar
         activePath="/profil/duzenle"
         rightClassName="nav-right"
-        rightContent={<span className="autosave"><span className="dot"></span> {dirty ? "taslak acik" : "yayin ile senkron"}</span>}
+        rightContent={<span className="autosave"><span className="dot"></span> {dirty ? "taslak açık" : "yayın ile senkron"}</span>}
       />
 
       <div className="breadcrumb">
@@ -298,29 +298,29 @@ export default function ProfilDuzenle() {
         <span className="sep">/</span>
         <Link href="/profil/me">{getProfileName(profile)}</Link>
         <span className="sep">/</span>
-        <span className="current">Duzenle</span>
+        <span className="current">Düzenle</span>
       </div>
 
       <div className="page-head">
         <div>
-          <h1>Profilini <em>sekillendir.</em></h1>
-          <p>Yetenekler, baglantilar ve biyografi. Baskalarinin seni ilk gordugunde anlayacagi seyler burada.</p>
+          <h1>Profilini <em>şekillendir.</em></h1>
+          <p>Yetenekler, bağlantılar ve biyografi. Başkalarının seni ilk gördüğünde anlayacağı şeyler burada.</p>
           {flashMessage ? <p className="field-hint">{flashMessage}</p> : null}
         </div>
         <div className="head-actions">
-          <button type="button" className="btn-secondary" onClick={handlePreview}>Onizle</button>
-          <button type="button" className="btn-primary" onClick={handlePublish} disabled={saving}>{saving ? "Yayinlaniyor..." : "Degisiklikleri Yayinla →"}</button>
+          <button type="button" className="btn-secondary" onClick={handlePreview}>Önizle</button>
+          <button type="button" className="btn-primary" onClick={handlePublish} disabled={saving}>{saving ? "Yayınlanıyor..." : "Değişiklikleri Yayınla →"}</button>
         </div>
       </div>
 
       <div className="edit-layout">
         <aside className="sidebar">
-          <div className="side-label">Bolumler</div>
+          <div className="side-label">Bölümler</div>
           <div className="side-nav">
             <a href="#temel-bilgiler" className="side-item active complete">Temel Bilgiler</a>
             <a href="#biyografi" className="side-item complete">Biyografi</a>
             <a href="#yetenekler" className="side-item">Yetenekler <span className="badge">{profile.skills.length}</span></a>
-            <a href="#baglantilar" className="side-item">Baglantilar <span className="badge">{previewLinks.length}</span></a>
+            <a href="#baglantilar" className="side-item">Bağlantılar <span className="badge">{previewLinks.length}</span></a>
             <a href="#bildirimler" className="side-item">Bildirimler</a>
             <a href="#gizlilik" className="side-item">Gizlilik</a>
           </div>
@@ -332,7 +332,7 @@ export default function ProfilDuzenle() {
               <span className="num">01</span>
               Temel Bilgiler
             </div>
-            <p className="form-section-desc">Baskalarinin seni arama sonuclarinda gordugu ilk bilgiler.</p>
+            <p className="form-section-desc">Başkalarının seni arama sonuçlarında gördüğü ilk bilgiler.</p>
 
             <div className="avatar-block">
               <div className={`avatar-big ${profile.avatarVariant}`} style={getAvatarStyle(profile)}>
@@ -344,11 +344,11 @@ export default function ProfilDuzenle() {
                 </div>
               </div>
               <div className="avatar-info">
-                <strong>Profil fotografi</strong>
+                <strong>Profil fotoğrafı</strong>
                 <span>PNG veya JPG - En az 400x400px - Maks 5MB</span>
                 <div className="avatar-actions">
-                  <button type="button" className="btn-mini" onClick={() => fileInputRef.current?.click()}>Yeni fotograf yukle</button>
-                  <button type="button" className="btn-mini danger" onClick={() => updateProfile("avatarImage", null)}>Kaldir</button>
+                  <button type="button" className="btn-mini" onClick={() => fileInputRef.current?.click()}>Yeni fotoğraf yükle</button>
+                  <button type="button" className="btn-mini danger" onClick={() => updateProfile("avatarImage", null)}>Kaldır</button>
                 </div>
                 <input
                   ref={fileInputRef}
@@ -360,7 +360,7 @@ export default function ProfilDuzenle() {
                     if (!file) return;
 
                     if (file.size > MAX_AVATAR_BYTES) {
-                      setFlashMessage("Fotograf 500KB'dan kucuk olmali (su an base64 olarak saklaniyor).");
+                      setFlashMessage("Fotoğraf 500KB'dan küçük olmalı (şu an base64 olarak saklanıyor).");
                       event.target.value = "";
                       return;
                     }
@@ -388,7 +388,7 @@ export default function ProfilDuzenle() {
 
             <div className="field-row">
               <div className="field">
-                <label>Kullanici adi</label>
+                <label>Kullanıcı adı</label>
                 <input type="text" value={profile.username} onChange={(event) => updateProfile("username", event.target.value.replace(/\s+/g, "").toLowerCase())} />
                 <span className="field-hint">nexus.app/{profile.username || "kullaniciadi"}</span>
               </div>
@@ -399,7 +399,7 @@ export default function ProfilDuzenle() {
             </div>
 
             <div className="field">
-              <label>Sehir</label>
+              <label>Şehir</label>
               <input type="text" value={profile.location} onChange={(event) => updateProfile("location", event.target.value)} />
             </div>
           </section>
@@ -409,12 +409,12 @@ export default function ProfilDuzenle() {
               <span className="num">02</span>
               Biyografi
             </div>
-            <p className="form-section-desc">Kim oldugunu kendi sozlerinle anlat. Kisa, net ve karakterli bir metin burada daha iyi calisir.</p>
+            <p className="form-section-desc">Kim olduğunu kendi sözlerinle anlat. Kısa, net ve karakterli bir metin burada daha iyi çalışır.</p>
 
             <div className="bio-tone-wrap">
               <div className="bio-tone-head">
                 <span className="bio-mini-title">Biyografi tonu</span>
-                <span className="bio-mini-hint">Secimin onizlemedeki metin hissini etkiler.</span>
+                <span className="bio-mini-hint">Seçimin önizlemedeki metin hissini etkiler.</span>
               </div>
               <div className="bio-tone-options">
                 {toneOptions.map((option) => (
@@ -433,19 +433,19 @@ export default function ProfilDuzenle() {
             <div className="bio-grid">
               <div className="bio-editor">
                 <div className="field">
-                  <label>Tek cumle ozet <span className="count">{profile.shortBio.length}/80</span></label>
+                  <label>Tek cümle özet <span className="count">{profile.shortBio.length}/80</span></label>
                   <input type="text" value={profile.shortBio} onChange={(event) => updateProfile("shortBio", event.target.value)} />
-                  <span className="field-hint">Profil kartinda adinin altinda gorunur.</span>
+                  <span className="field-hint">Profil kartında adının altında görünür.</span>
                 </div>
 
                 <div className="field">
                   <label>Uzun biyografi <span className="count">{profile.bio.length}/500</span></label>
                   <textarea value={profile.bio} onChange={(event) => updateProfile("bio", event.target.value)} />
-                  <span className="field-hint">Satir atlamak icin Enter kullanabilirsin.</span>
+                  <span className="field-hint">Satır atlamak için Enter kullanabilirsin.</span>
                 </div>
 
                 <div className="bio-keywords">
-                  <div className="bio-mini-title">One cikan basliklar</div>
+                  <div className="bio-mini-title">Öne çıkan başlıklar</div>
                   <div className="bio-keyword-list">
                     {keywordOptions.map((keyword) => (
                       <button
@@ -462,12 +462,12 @@ export default function ProfilDuzenle() {
               </div>
 
               <aside className="bio-preview-panel">
-                <div className="bio-preview-label">Profilde gorunum</div>
-                <p className="bio-preview-text">&quot;{profile.shortBio || "Kisa bir ozet ekle."}&quot;</p>
+                <div className="bio-preview-label">Profilde görünüm</div>
+                <p className="bio-preview-text">&quot;{profile.shortBio || "Kısa bir özet ekle."}&quot;</p>
                 <div className="bio-preview-divider" />
                 <div className="bio-preview-meta">
                   <span>Ton: {profile.bioTone}</span>
-                  <span>Secili baslik: {profile.keywords.length}</span>
+                  <span>Seçili başlık: {profile.keywords.length}</span>
                 </div>
               </aside>
             </div>
@@ -478,7 +478,7 @@ export default function ProfilDuzenle() {
               <span className="num">03</span>
               Yetenekler
             </div>
-            <p className="form-section-desc">Neler yapabildigini etiketler halinde ekle. Baskalari bunlari filtreleyerek seni bulacak.</p>
+            <p className="form-section-desc">Neler yapabildiğini etiketler halinde ekle. Başkaları bunları filtreleyerek seni bulacak.</p>
 
             <div className="skills-wrap">
               <div className="skills-list">
@@ -509,9 +509,9 @@ export default function ProfilDuzenle() {
           <section id="baglantilar" className="form-section fade-up">
             <div className="form-section-title">
               <span className="num">04</span>
-              Baglantilar
+              Bağlantılar
             </div>
-            <p className="form-section-desc">Portfolyo, sosyal medya, kisisel site. Maks. 6 link.</p>
+            <p className="form-section-desc">Portfolyo, sosyal medya, kişisel site. Maks. 6 link.</p>
 
             {profile.links.map((link) => (
               <div key={link.id} className="link-row">
@@ -530,7 +530,7 @@ export default function ProfilDuzenle() {
               </div>
             ))}
             <button type="button" className="add-link" onClick={addLink} disabled={profile.links.length >= 6}>
-              + Yeni baglanti ekle
+              + Yeni bağlantı ekle
             </button>
           </section>
 
@@ -539,19 +539,19 @@ export default function ProfilDuzenle() {
               <span className="num">05</span>
               Bildirimler
             </div>
-            <p className="form-section-desc">Almak istedigin bildirimleri sec.</p>
+            <p className="form-section-desc">Almak istediğin bildirimleri seç.</p>
 
             <div className="toggle-row">
               <div className="toggle-info">
-                <strong>Is birligi taleplerini al</strong>
-                <span>Profil detay sayfasindaki is birligi butonunu iletisim kanallarinla eslestirir.</span>
+                <strong>İş birliği taleplerini al</strong>
+                <span>Profil detay sayfasındaki iş birliği butonunu iletişim kanallarınla eşleştirir.</span>
               </div>
               <button type="button" className={`toggle${profile.collaborationOpen ? " on" : ""}`} onClick={() => updateProfile("collaborationOpen", !profile.collaborationOpen)} />
             </div>
             <div className="toggle-row">
               <div className="toggle-info">
-                <strong>Haftalik ozet gonder</strong>
-                <span>Onizleme ve bilgilendirme metinlerinde haftalik ozetlerin acik oldugunu gosterir.</span>
+                <strong>Haftalık özet gönder</strong>
+                <span>Önizleme ve bilgilendirme metinlerinde haftalık özetlerin açık olduğunu gösterir.</span>
               </div>
               <button type="button" className={`toggle${profile.weeklyDigest ? " on" : ""}`} onClick={() => updateProfile("weeklyDigest", !profile.weeklyDigest)} />
             </div>
@@ -562,54 +562,54 @@ export default function ProfilDuzenle() {
               <span className="num">06</span>
               Gizlilik
             </div>
-            <p className="form-section-desc">Profilinin kim tarafindan ve nasil gorulecegini kontrol et.</p>
+            <p className="form-section-desc">Profilinin kim tarafından ve nasıl görüleceğini kontrol et.</p>
 
             <div className="toggle-row">
               <div className="toggle-info">
-                <strong>Profilim kesfet sayfasinda gorunsun</strong>
-                <span>Kapattiginda sadece dogrudan linkten ulasilabilir olursun.</span>
+                <strong>Profilim keşfet sayfasında görünsün</strong>
+                <span>Kapattığında sadece doğrudan linkten ulaşılabilir olursun.</span>
               </div>
               <button type="button" className={`toggle${profile.discoverable ? " on" : ""}`} onClick={() => updateProfile("discoverable", !profile.discoverable)} />
             </div>
             <div className="toggle-row">
               <div className="toggle-info">
-                <strong>E-posta adresimi sadece baglantilarim gorsun</strong>
-                <span>Kapali tutarsan e-posta gizli kalir.</span>
+                <strong>E-posta adresimi sadece bağlantılarım görsün</strong>
+                <span>Kapalı tutarsan e-posta gizli kalır.</span>
               </div>
               <button type="button" className={`toggle${profile.connectionsOnlyEmail ? " on" : ""}`} onClick={() => updateProfile("connectionsOnlyEmail", !profile.connectionsOnlyEmail)} />
             </div>
             <div className="toggle-row">
               <div className="toggle-info">
-                <strong>Kim profilimi goruntuledi bildirimi</strong>
-                <span>Birisi profiline baktiginda anlik bildirim al.</span>
+                <strong>Kim profilimi görüntüledi bildirimi</strong>
+                <span>Birisi profiline baktığında anlık bildirim al.</span>
               </div>
               <button type="button" className={`toggle${profile.profileViewNotifications ? " on" : ""}`} onClick={() => updateProfile("profileViewNotifications", !profile.profileViewNotifications)} />
             </div>
           </section>
 
           <div className="danger-zone">
-            <div className="danger-title">Tehlikeli bolge</div>
-            <p className="danger-desc">Hesap silme islemi geri alinamaz.</p>
+            <div className="danger-title">Tehlikeli bölge</div>
+            <p className="danger-desc">Hesap silme işlemi geri alınamaz.</p>
             <div className="danger-actions">
-              <button type="button" className="btn-danger" onClick={handleDeleteAccount}>Hesabi Kalici Olarak Sil</button>
+              <button type="button" className="btn-danger" onClick={handleDeleteAccount}>Hesabı Kalıcı Olarak Sil</button>
             </div>
           </div>
 
           <div className="bottom-bar">
             <div className="bar-info">
               <span className="pill">{dirty ? "KAYDEDILMEMIS" : "SENKRON"}</span>
-              <span>{dirty ? `${changeCount || 1} bolumde degisiklik var - yayinlamayi unutma` : "Taslak son yayinlanan surumle ayni"}</span>
+              <span>{dirty ? `${changeCount || 1} bölümde değişiklik var - yayınlamayı unutma` : "Taslak son yayınlanan sürümle aynı"}</span>
             </div>
             <div className="bar-actions">
               <button type="button" className="bar-cancel" onClick={handleReset}>Vazgec</button>
-              <button type="button" className="bar-save" onClick={handlePublish} disabled={saving}>{saving ? "Yayinlaniyor..." : "Yayinla →"}</button>
+              <button type="button" className="bar-save" onClick={handlePublish} disabled={saving}>{saving ? "Yayınlanıyor..." : "Yayınla →"}</button>
             </div>
           </div>
         </main>
 
         <aside className="preview">
           <div className="preview-head">
-            <span className="preview-label">Canli Onizleme</span>
+            <span className="preview-label">Canlı Önizleme</span>
             <div className="preview-toggle">
               <button type="button" className={previewMode === "card" ? "active" : ""} onClick={() => setPreviewMode("card")}>Kart</button>
               <button type="button" className={previewMode === "full" ? "active" : ""} onClick={() => setPreviewMode("full")}>Tam</button>
@@ -627,7 +627,7 @@ export default function ProfilDuzenle() {
                   <div className="pv-role">{previewUser.role} • {previewUser.location}</div>
                 </div>
               </div>
-              <p className="pv-bio">{profile.shortBio || "Kisa biyografin burada gorunecek."}</p>
+              <p className="pv-bio">{profile.shortBio || "Kısa biyografin burada görünecek."}</p>
               {previewMode === "full" ? (
                 <p className="card-desc">{profile.bio}</p>
               ) : null}
@@ -640,7 +640,7 @@ export default function ProfilDuzenle() {
                 </div>
               </div>
               <div>
-                <div className="pv-section">Baglantilar</div>
+                <div className="pv-section">Bağlantılar</div>
                 <div className="pv-links">
                   {previewLinks.length > 0 ? (
                     previewLinks.map((link) => (
@@ -649,17 +649,17 @@ export default function ProfilDuzenle() {
                       </a>
                     ))
                   ) : (
-                    <span className="field-hint">Henuz gorunur baglanti eklenmedi.</span>
+                    <span className="field-hint">Henüz görünür bağlantı eklenmedi.</span>
                   )}
                 </div>
               </div>
             </div>
 
             <div className="preview-footer">
-              <strong>Ipucu</strong>
+              <strong>İpucu</strong>
               {dirty
-                ? "Onizleme anlik olarak taslaginla guncelleniyor. Begendiginde yayinlayabilirsin."
-                : "Yayinlanan surumle ayni gorunumdesin. Yeni bir degisiklik yaptiginda bu alan da guncellenecek."}
+                ? "Önizleme anlık olarak taslağınla güncelleniyor. Beğendiğinde yayınlayabilirsin."
+                : "Yayınlanan sürümle aynı görünümde. Yeni bir değişiklik yaptığında bu alan da güncellenecek."}
             </div>
           </div>
         </aside>

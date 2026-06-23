@@ -9,7 +9,6 @@ import ForWhom from "@/components/landing/ForWhom";
 import HeroCities from "@/components/landing/HeroCities";
 import HowItWorks from "@/components/landing/HowItWorks";
 import Principles from "@/components/landing/Principles";
-import Footer from "@/components/layout/Footer";
 import Navbar from "@/components/layout/Navbar";
 import HomeSkeleton from "@/components/ui/HomeSkeleton";
 import { getMe } from "@/lib/auth-api";
@@ -59,7 +58,7 @@ export default function Home() {
           <input
             type="text"
             className="search"
-            placeholder="Isim, yetenek, sehir ara..."
+            placeholder="İsim, yetenek, şehir ara..."
             value={searchQuery}
             onChange={(event) => setSearchQuery(event.target.value)}
             onKeyDown={(event) => {
@@ -128,7 +127,6 @@ export default function Home() {
         )}
       */}
 
-      <Footer />
     </div>
   );
 }

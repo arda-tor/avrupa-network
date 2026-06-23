@@ -24,26 +24,26 @@ export default function LoginPage() {
         <div className="animate-[fadeUp_.8s_cubic-bezier(.2,.7,.2,1)_both] md:pt-6">
           <div className="mb-6 inline-flex items-center gap-2 font-mono text-[11px] uppercase tracking-[0.15em] text-mute">
             <span className="h-1.5 w-1.5 rounded-full bg-accent" />
-            Tekrar hos geldin
+            Tekrar hoş geldin
           </div>
 
           <h1 className="font-serif text-[clamp(52px,7vw,92px)] font-normal leading-[0.95] tracking-[-0.035em] text-ink">
-            Hesabina <em className="italic text-accent">geri don.</em>
+            Hesabına <em className="italic text-accent">geri dön.</em>
           </h1>
 
           <p className="mt-6 max-w-xl text-[17px] leading-[1.5] text-ink-soft">
-            Hesabina erismek ve baglantilarina kaldigin yerden devam etmek
-            icin giris yap.
+            Hesabına erişmek ve bağlantılarına kaldığın yerden devam etmek
+            için giriş yap.
           </p>
         </div>
 
         <div className="animate-[fadeUp_.8s_cubic-bezier(.2,.7,.2,1)_both] rounded-[24px] border border-line bg-card p-7 shadow-[0_18px_40px_rgba(26,26,26,.06)]">
           <div className="mb-6">
             <h2 className="font-serif text-[34px] font-medium tracking-[-0.03em] text-ink">
-              Login
+              Giriş
             </h2>
             <p className="mt-2 text-sm leading-6 text-ink-soft">
-              E-posta ve sifre ile giris deneyebilirsin.
+              E-posta ve şifre ile giriş yapabilirsin.
             </p>
           </div>
 
@@ -85,7 +85,7 @@ export default function LoginPage() {
                 type="email"
                 value={email}
                 onChange={(event) => setEmail(event.target.value)}
-                placeholder="ornek@mail.com"
+                placeholder="örnek@mail.com"
                 required
                 className="w-full rounded-xl border border-line bg-bg px-4 py-[15px] text-[15px] text-ink outline-none transition placeholder:text-mute focus:border-accent focus:ring-4 focus:ring-accent/10"
               />
@@ -93,7 +93,7 @@ export default function LoginPage() {
 
             <label className="flex flex-col gap-2">
               <span className="font-mono text-[11px] uppercase tracking-[0.1em] text-ink-soft">
-                Sifre
+                Şifre
               </span>
               <input
                 type="password"
@@ -116,14 +116,14 @@ export default function LoginPage() {
               disabled={loading}
               className="mt-1 min-h-12 rounded-full bg-accent px-5 text-sm font-semibold text-white transition hover:bg-ink disabled:cursor-not-allowed disabled:opacity-70"
             >
-              {loading ? "Giris yapiliyor..." : "Login"}
+              {loading ? "Giriş yapılıyor..." : "Giriş yap"}
             </button>
           </form>
 
           <p className="mt-5 text-[13px] text-ink-soft">
-            Hesabin yok mu?{" "}
+            Hesabın yok mu?{" "}
             <Link href="/kayit" className="font-semibold text-ink transition hover:text-accent">
-              Register
+              Kayıt ol
             </Link>
           </p>
         </div>

@@ -152,7 +152,7 @@ export default function ProfileDetailPage() {
       return (
         <div className="wrap pd-wrap">
           <Navbar activePath="/profil/duzenle" />
-          <div className="pd-topbar">Yukleniyor...</div>
+          <div className="pd-topbar">Yükleniyor...</div>
         </div>
       );
     }
@@ -183,9 +183,9 @@ export default function ProfileDetailPage() {
 
     try {
       await navigator.clipboard.writeText(shareUrl);
-      setSavedMessage("Profil baglantisi panoya kopyalandi.");
+      setSavedMessage("Profil bağlantısı panoya kopyalandı.");
     } catch {
-      setSavedMessage("Baglanti kopyalanamadi, adres cubugundan paylasabilirsin.");
+      setSavedMessage("Bağlantı kopyalanamadı, adres çubuğundan paylaşabilirsin.");
     }
   };
 
@@ -196,7 +196,7 @@ export default function ProfileDetailPage() {
     }
 
     const nextState = toggleConnectedUserId(user.id);
-    setSavedMessage(nextState ? "Profil favorilere eklendi." : "Profil favorilerden cikarildi.");
+    setSavedMessage(nextState ? "Profil favorilere eklendi." : "Profil favorilerden çıkarıldı.");
   };
 
   const highlightedSkills = user.skills.slice(0, 4);
@@ -218,7 +218,7 @@ export default function ProfileDetailPage() {
             router.back();
           }}
         >
-          <span className="pd-arr">←</span> {previewMode ? "Duzenlemeye geri don" : "Aramaya geri don"}
+          <span className="pd-arr">←</span> {previewMode ? "Düzenlemeye geri dön" : "Aramaya geri dön"}
         </button>
       </div>
 
@@ -247,10 +247,10 @@ export default function ProfileDetailPage() {
             <>
               <Link href="/profil/duzenle" className="pd-btn-primary">
                 <span className="pd-btn-icon">✎</span>
-                Profili Duzenle
+                Profili Düzenle
               </Link>
               <button type="button" className="pd-btn-dark" onClick={handleCopyProfileLink}>
-                Baglantiyi Paylas
+                Bağlantıyı Paylaş
               </button>
             </>
           ) : (
@@ -270,9 +270,9 @@ export default function ProfileDetailPage() {
 
       <div className="pd-tabs">
         {([
-          { id: "about", label: "Hakkinda" },
+          { id: "about", label: "Hakkında" },
           { id: "skills", label: "Yetenekler" },
-          { id: "links", label: "Baglantilar" },
+          { id: "links", label: "Bağlantılar" },
         ] as { id: Tab; label: string }[]).map((tab) => (
           <button
             key={tab.id}
@@ -295,9 +295,9 @@ export default function ProfileDetailPage() {
 
             <div className="pd-section">
               <div className="pd-section-label">
-                One cikan yetenekler
+                Öne çıkan yetenekler
                 <button type="button" className="pd-more" onClick={() => setActiveTab("skills")}>
-                  Tumunu gor →
+                  Tümünü gör →
                 </button>
               </div>
               <div className="pd-skill-grid pd-skill-grid-simple">
@@ -313,7 +313,7 @@ export default function ProfileDetailPage() {
 
         {activeTab === "skills" && (
           <div className="pd-section">
-            <div className="pd-section-label">Tum yetenekler</div>
+            <div className="pd-section-label">Tüm yetenekler</div>
             <div className="pd-skills-list">
               {user.skills.map((skill) => (
                 <span key={skill} className="pd-skill-chip">
@@ -326,7 +326,7 @@ export default function ProfileDetailPage() {
 
         {activeTab === "links" && (
           <div className="pd-section">
-            <div className="pd-section-label">Baglantilar</div>
+            <div className="pd-section-label">Bağlantılar</div>
             <div className="pd-links">
               {detailLinks.map((link) => (
                 <a key={link.id} href={link.href} className="pd-link" target="_blank" rel="noreferrer">
@@ -342,7 +342,7 @@ export default function ProfileDetailPage() {
       {!isCurrentUser && relatedUsers.length > 0 && (
         <div className="pd-similar">
           <div className="pd-section-label">
-            Ayni sehir ve meslekte olanlar icin
+            Aynı şehir ve meslekte olanlar için
             <Link href="/ara" className="pd-more">
               Daha fazla →
             </Link>

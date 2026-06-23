@@ -2,7 +2,6 @@
 
 import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
-import Footer from "@/components/layout/Footer";
 import Navbar from "@/components/layout/Navbar";
 // Mock kullanici listesi kaldirildi; kullanicilar DB aramasindan cekiliyor.
 // import { users } from "@/data/users";
@@ -71,21 +70,21 @@ export default function Agim() {
         <h2>
           Favorilerim <em className="network-count-em">{savedUsers.length}</em>
         </h2>
-        <div className="section-meta">kaydettigin kisiler</div>
+        <div className="section-meta">kaydettiğin kişiler</div>
       </div>
 
       {savedUsers.length === 0 ? (
         <div className="network-empty">
           <div className="network-empty-icon">◌</div>
-          <p>Henuz kimseyi kaydetmedin.</p>
-          <Link href="/" className="btn-ghost network-empty-link">Kesfetmeye Basla</Link>
+          <p>Henüz kimseyi kaydetmedin.</p>
+          <Link href="/" className="btn-ghost network-empty-link">Keşfetmeye Başla</Link>
         </div>
       ) : null}
 
       {savedUsers.length > 0 && filteredUsers.length === 0 ? (
         <div className="network-empty">
           <div className="network-empty-icon">◌</div>
-          <p>Aramana uyan kayitli profil bulunamadi.</p>
+          <p>Aramana uyan kayıtlı profil bulunamadı.</p>
           <button type="button" className="btn-ghost network-empty-link" onClick={() => setQuery("")}>
             Aramayi Temizle
           </button>
@@ -99,7 +98,7 @@ export default function Agim() {
 
             return (
               <div key={user.id} className="card fade-up">
-                <Link href={`/profil/${user.id}`} className="card-main-link" aria-label={`${user.name} profil detaylarini ac`}>
+                <Link href={`/profil/${user.id}`} className="card-main-link" aria-label={`${user.name} profil detaylarını aç`}>
                   <div className="card-top">
                     <div className={`card-avatar ${user.avatarVariant}`}>{user.initial}</div>
                     <div className="card-arrow">
@@ -121,13 +120,13 @@ export default function Agim() {
                   </div>
                 </Link>
                 <div className="card-footer">
-                  <div className="network-status">{isConnected ? "◆ Bagli" : "◆ Kaydedildi"}</div>
+                  <div className="network-status">{isConnected ? "◆ Bağlı" : "◆ Kaydedildi"}</div>
                   <button
                     type="button"
                     className="card-connect network-remove"
                     onClick={() => removeUserFromNetwork(user.id)}
                   >
-                    Kaldir
+                    Kaldır
                   </button>
                 </div>
               </div>
@@ -136,7 +135,6 @@ export default function Agim() {
         </section>
       ) : null}
 
-      <Footer />
     </div>
   );
 }
