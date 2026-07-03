@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import Navbar from "@/components/layout/Navbar";
+import ConnectLinkedInButton from "@/components/auth/ConnectLinkedInButton";
 import {
   formatProfileLinkValue,
   getProfileInitial,
@@ -122,6 +123,7 @@ export default function ProfilDuzenle() {
   const [flashMessage, setFlashMessage] = useState("");
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
+  const [linkedInConnected, setLinkedInConnected] = useState(false);
 
   // Load the live profile from the backend as the source of truth.
   useEffect(() => {
@@ -139,6 +141,7 @@ export default function ProfilDuzenle() {
       const editable = currentUserToEditable(resp.user);
       setProfile(editable);
       setPublishedProfile(editable);
+      setLinkedInConnected(resp.user.linkedInConnected);
       writeProfileDraft(editable);
       setLoading(false);
     })();
@@ -512,6 +515,23 @@ export default function ProfilDuzenle() {
               Bağlantılar
             </div>
             <p className="form-section-desc">Portfolyo, sosyal medya, kişisel site. Maks. 6 link.</p>
+
+            <div className="mb-6 flex items-center justify-between gap-4 rounded-2xl border border-line bg-bg p-4">
+              <div className="flex items-center gap-3">
+                <svg viewBox="0 0 24 24" aria-hidden="true" className="h-8 w-8 shrink-0" fill="#0A66C2">
+                  <path d="M19 0h-14c-2.76 0-5 2.24-5 5v14c0 2.76 2.24 5 5 5h14c2.76 0 5-2.24 5-5v-14c0-2.76-2.24-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.27c-.97 0-1.75-.79-1.75-1.76s.78-1.75 1.75-1.75 1.75.79 1.75 1.75-.78 1.76-1.75 1.76zm13.5 12.27h-3v-5.6c0-3.37-4-3.12-4 0v5.6h-3v-11h3v1.76c1.4-2.59 7-2.78 7 2.48v6.76z" />
+                </svg>
+                <div>
+                  <strong className="block text-[14px] text-ink">LinkedIn</strong>
+                  <span className="text-[13px] text-ink-soft">
+                    {linkedInConnected
+                      ? "LinkedIn hesabın bağlı."
+                      : "Profilini doğrulamak için LinkedIn hesabını bağla."}
+                  </span>
+                </div>
+              </div>
+              <ConnectLinkedInButton connected={linkedInConnected} onError={setFlashMessage} />
+            </div>
 
             {profile.links.map((link) => (
               <div key={link.id} className="link-row">

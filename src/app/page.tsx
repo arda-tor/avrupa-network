@@ -9,14 +9,16 @@ import ForWhom from "@/components/landing/ForWhom";
 import HeroCities from "@/components/landing/HeroCities";
 import HowItWorks from "@/components/landing/HowItWorks";
 import Principles from "@/components/landing/Principles";
+import Footer from "@/components/layout/Footer";
 import Navbar from "@/components/layout/Navbar";
+import ConnectLinkedInModal from "@/components/auth/ConnectLinkedInModal";
 import HomeSkeleton from "@/components/ui/HomeSkeleton";
 import { getMe } from "@/lib/auth-api";
 import { useAuth } from "@/store/auth";
 import { isApiErrorResponse } from "@/types/auth";
 
 export default function Home() {
-  const { user, setUserState, loading, setLoading } = useAuth();
+  const { user, setUserState, loading, setLoading, linkedInPrompt, setLinkedInPrompt } = useAuth();
   const router = useRouter();
   const [searchQuery, setSearchQuery] = useState("");
 
@@ -127,6 +129,11 @@ export default function Home() {
         )}
       */}
 
+      <Footer />
+
+      {user && linkedInPrompt ? (
+        <ConnectLinkedInModal onDismiss={() => setLinkedInPrompt(false)} />
+      ) : null}
     </div>
   );
 }

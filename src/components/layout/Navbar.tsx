@@ -3,6 +3,7 @@
 import type { ReactNode } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import Logo from "@/components/brand/Logo";
 import { cn } from "@/lib/utils";
 import { logout as logoutRequest } from "@/lib/auth-api";
 import { useAuth } from "@/store/auth";
@@ -39,10 +40,10 @@ export default function Navbar({
 
   return (
     <nav>
-      <div className="logo">
-        <div className="logo-mark">T</div>
+      <Link href="/" className="logo">
+        <Logo size={32} />
         Turkhub
-      </div>
+      </Link>
       <div className="nav-links">
         {navItems.filter((item) => !item.requiresAuth || user).map((item) => (
           <Link key={item.href} href={item.href} className={activePath === item.href ? "active" : undefined}>

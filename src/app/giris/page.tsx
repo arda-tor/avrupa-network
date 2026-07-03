@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import Navbar from "@/components/layout/Navbar";
+import LinkedInButton from "@/components/auth/LinkedInButton";
 import { getMe, login } from "@/lib/auth-api";
 import { useAuth } from "@/store/auth";
 import { ApiErrorResponse, isApiErrorResponse } from "@/types/auth";
@@ -119,6 +120,16 @@ export default function LoginPage() {
               {loading ? "Giriş yapılıyor..." : "Giriş yap"}
             </button>
           </form>
+
+          <div className="my-5 flex items-center gap-3">
+            <span className="h-px flex-1 bg-line" />
+            <span className="font-mono text-[11px] uppercase tracking-[0.1em] text-mute">
+              veya
+            </span>
+            <span className="h-px flex-1 bg-line" />
+          </div>
+
+          <LinkedInButton onError={setError} />
 
           <p className="mt-5 text-[13px] text-ink-soft">
             Hesabın yok mu?{" "}

@@ -5,18 +5,18 @@ import Link from "next/link";
 import Navbar from "@/components/layout/Navbar";
 import { searchUsers } from "@/lib/auth-api";
 import { searchUserToUser } from "@/lib/profile-mapper";
-import { useConnectedUsersState } from "@/lib/mock-social";
+import { useConnectedUsersState } from "@/lib/social";
 import { isApiErrorResponse } from "@/types/auth";
 import type { User } from "@/types";
 
 const categories = [
-  { id: "design", label: "Tasarım", count: 412 },
-  { id: "software", label: "Yazılım", count: 890 },
-  { id: "art", label: "Sanat & İllüstrasyon", count: 204 },
-  { id: "writing", label: "Yazarlık", count: 156 },
-  { id: "photo", label: "Fotoğraf", count: 178 },
-  { id: "music", label: "Müzik & Ses", count: 92 },
-  { id: "data", label: "Veri & Araştırma", count: 143 },
+  { id: "design", label: "Tasarım" },
+  { id: "software", label: "Yazılım" },
+  { id: "art", label: "Sanat & İllüstrasyon" },
+  { id: "writing", label: "Yazarlık" },
+  { id: "photo", label: "Fotoğraf" },
+  { id: "music", label: "Müzik & Ses" },
+  { id: "data", label: "Veri & Araştırma" },
 ];
 
 const cityOptions = ["İstanbul", "Ankara", "İzmir", "Bursa", "Berlin", "Londra"];
@@ -48,7 +48,7 @@ function ConnectButton({ userId }: { userId: string }) {
       onClick={(event) => {
         event.preventDefault();
         event.stopPropagation();
-        toggleConnectedUserId(userId);
+        void toggleConnectedUserId(userId);
       }}
     >
       {isConnected ? "✓ Eklendi" : "+ Ekle"}
@@ -168,7 +168,9 @@ export default function SearchPage() {
               >
                 <span className="sh-check" />
                 {category.label}
-                <span className="sh-check-count">{category.count}</span>
+                <span className="sh-check-count">
+                  {fetchedUsers.filter((user) => matchesCategory(user.role, category.id)).length}
+                </span>
               </label>
             ))}
           </div>

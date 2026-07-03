@@ -1,5 +1,6 @@
 import type {
   ApiErrorResponse,
+  AuthorizationUrlResponse,
   CsrfResponse,
   CurrentUser,
   LoginInput,
@@ -48,6 +49,30 @@ export async function register(input: RegisterInput): Promise<UnifiedResponse<Lo
   if (isApiErrorResponse(csrf)) return csrf;
 
   return baseRequest<LoginResponse>("/auth/register", "POST", input, { [csrf.headerName]: csrf.csrfToken });
+}
+
+export async function getLinkedInLoginUrl(): Promise<UnifiedResponse<AuthorizationUrlResponse>> {
+  const csrf = await getCsrfToken();
+  if (isApiErrorResponse(csrf)) return csrf;
+
+  return baseRequest<AuthorizationUrlResponse>(
+    "/auth/linkedin/login-url",
+    "POST",
+    undefined,
+    { [csrf.headerName]: csrf.csrfToken },
+  );
+}
+
+export async function getLinkedInConnectUrl(): Promise<UnifiedResponse<AuthorizationUrlResponse>> {
+  const csrf = await getCsrfToken();
+  if (isApiErrorResponse(csrf)) return csrf;
+
+  return baseRequest<AuthorizationUrlResponse>(
+    "/auth/linkedin/connect-url",
+    "POST",
+    undefined,
+    { [csrf.headerName]: csrf.csrfToken },
+  );
 }
 
 export async function getMe(): Promise<UnifiedResponse<{ user: CurrentUser }>> {

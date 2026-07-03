@@ -4,8 +4,6 @@ import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import { notFound, useParams, useRouter, useSearchParams } from "next/navigation";
 import Navbar from "@/components/layout/Navbar";
-// Mock kullanici listesi kaldirildi; diger kullanicilar DB aramasindan cekiliyor.
-// import { users } from "@/data/users";
 import { searchUsers } from "@/lib/auth-api";
 import { searchUserToUser } from "@/lib/profile-mapper";
 import type { User } from "@/types";
@@ -18,7 +16,7 @@ import {
   readProfileDraft,
   type EditableProfileLink,
 } from "@/lib/mock-profile";
-import { useConnectedUsersState } from "@/lib/mock-social";
+import { useConnectedUsersState } from "@/lib/social";
 import { getMe } from "@/lib/auth-api";
 import { currentUserToEditable, emptyEditableProfile } from "@/lib/profile-mapper";
 import { isApiErrorResponse } from "@/types/auth";
@@ -43,14 +41,6 @@ function getUserAvatarStyle(avatarImage?: string | null) {
 }
 
 type Tab = "about" | "skills" | "links";
-
-// Diger kullanicilar icin sahte baglanti verisi kaldirildi (DB'de karsiligi yok).
-// const otherUserLinks = [
-//   { href: "https://studio.example", value: "studio.example", label: "Portfolyo" },
-//   { href: "https://instagram.com/illustration", value: "@illustration", label: "Instagram" },
-//   { href: "https://dribbble.com/handle", value: "dribbble.com/handle", label: "Dribbble" },
-//   { href: "mailto:hello@studio.example", value: "hello@studio.example", label: "E-posta" },
-// ];
 
 function buildRelatedUsers(pool: User[], currentId: string, role: string, location: string) {
   const roleToken = role
@@ -88,7 +78,6 @@ export default function ProfileDetailPage() {
 
   const { connectedUserIds, toggleConnectedUserId } = useConnectedUsersState();
 
-  // Diger kullanicilar (goruntulenen profil + benzer kisiler) DB'den cekiliyor.
   useEffect(() => {
     let cancelled = false;
 
@@ -122,7 +111,6 @@ export default function ProfileDetailPage() {
       };
     }
 
-    // The own profile ("me") is loaded from the backend; numeric ids stay mock.
     if (!isMe) return;
 
     let cancelled = false;
@@ -189,13 +177,13 @@ export default function ProfileDetailPage() {
     }
   };
 
-  const handlePrimaryAction = () => {
+  const handlePrimaryAction = async () => {
     if (isCurrentUser) {
       router.push("/profil/duzenle");
       return;
     }
 
-    const nextState = toggleConnectedUserId(user.id);
+    const nextState = await toggleConnectedUserId(user.id);
     setSavedMessage(nextState ? "Profil favorilere eklendi." : "Profil favorilerden çıkarıldı.");
   };
 

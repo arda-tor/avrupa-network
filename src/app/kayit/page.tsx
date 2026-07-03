@@ -4,12 +4,13 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import Navbar from "@/components/layout/Navbar";
+import LinkedInButton from "@/components/auth/LinkedInButton";
 import { getMe, register } from "@/lib/auth-api";
 import { useAuth } from "@/store/auth";
 import { ApiErrorResponse, isApiErrorResponse } from "@/types/auth";
 
 export default function RegisterPage() {
-  const { setUserState } = useAuth();
+  const { setUserState, setLinkedInPrompt } = useAuth();
   const router = useRouter();
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
@@ -73,6 +74,7 @@ export default function RegisterPage() {
                 }
 
                 setUserState(resp.user);
+                setLinkedInPrompt(true);
                 router.push("/");
               } finally {
                 setLoading(false);
@@ -136,6 +138,16 @@ export default function RegisterPage() {
               {loading ? "Kayıt oluşturuluyor..." : "Kayıt ol"}
             </button>
           </form>
+
+          <div className="my-5 flex items-center gap-3">
+            <span className="h-px flex-1 bg-line" />
+            <span className="font-mono text-[11px] uppercase tracking-[0.1em] text-mute">
+              veya
+            </span>
+            <span className="h-px flex-1 bg-line" />
+          </div>
+
+          <LinkedInButton label="LinkedIn ile kaydol" onError={setError} />
 
           <p className="mt-5 text-[13px] text-ink-soft">
             Zaten hesabın var mı?{" "}

@@ -3,18 +3,16 @@
 import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
 import Navbar from "@/components/layout/Navbar";
-// Mock kullanici listesi kaldirildi; kullanicilar DB aramasindan cekiliyor.
-// import { users } from "@/data/users";
 import { searchUsers } from "@/lib/auth-api";
 import { searchUserToUser } from "@/lib/profile-mapper";
-import { removeUserFromNetwork, useConnectedUsersState, useSavedUsersState } from "@/lib/mock-social";
+import { useConnectedUsersState, useSavedUsersState } from "@/lib/social";
 import { isApiErrorResponse } from "@/types/auth";
 import type { User } from "@/types";
 
 export default function Agim() {
   const [query, setQuery] = useState("");
   const [allUsers, setAllUsers] = useState<User[]>([]);
-  const { savedUserIds } = useSavedUsersState();
+  const { savedUserIds, removeUserFromNetwork } = useSavedUsersState();
   const { connectedUserIds } = useConnectedUsersState();
 
   useEffect(() => {
@@ -124,7 +122,7 @@ export default function Agim() {
                   <button
                     type="button"
                     className="card-connect network-remove"
-                    onClick={() => removeUserFromNetwork(user.id)}
+                    onClick={() => void removeUserFromNetwork(user.id)}
                   >
                     Kaldır
                   </button>
