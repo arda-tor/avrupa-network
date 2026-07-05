@@ -75,6 +75,18 @@ export async function getLinkedInConnectUrl(): Promise<UnifiedResponse<Authoriza
   );
 }
 
+export async function disconnectLinkedIn(): Promise<UnifiedResponse<void>> {
+  const csrf = await getCsrfToken();
+  if (isApiErrorResponse(csrf)) return csrf;
+
+  return baseRequest<void>(
+    "/auth/linkedin/connection",
+    "DELETE",
+    undefined,
+    { [csrf.headerName]: csrf.csrfToken },
+  );
+}
+
 export async function getMe(): Promise<UnifiedResponse<{ user: CurrentUser }>> {
   const resp = await baseRequest<{ user: CurrentUser }>("/auth/me", "GET");
   return resp;

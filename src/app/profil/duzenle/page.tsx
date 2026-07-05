@@ -530,7 +530,14 @@ export default function ProfilDuzenle() {
                   </span>
                 </div>
               </div>
-              <ConnectLinkedInButton connected={linkedInConnected} onError={setFlashMessage} />
+              <ConnectLinkedInButton
+                connected={linkedInConnected}
+                onError={setFlashMessage}
+                onDisconnected={() => {
+                  setLinkedInConnected(false);
+                  setFlashMessage("LinkedIn bağlantısı kaldırıldı.");
+                }}
+              />
             </div>
 
             {profile.links.map((link) => (
