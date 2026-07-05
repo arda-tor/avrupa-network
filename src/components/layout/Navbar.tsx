@@ -19,7 +19,7 @@ const navItems = [
   { href: "/", label: "Ana Sayfa" },
   { href: "/ara", label: "Ara" },
   { href: "/agim", label: "Favorilerim", requiresAuth: true },
-  { href: "/profil/duzenle", label: "Profilim" },
+  { href: "/profil/duzenle", label: "Profilim", requiresAuth: true },
 ];
 
 export default function Navbar({
@@ -41,7 +41,7 @@ export default function Navbar({
   return (
     <nav>
       <Link href="/" className="logo">
-        <Logo size={32} />
+        <Logo size={64} />
         Turkhub
       </Link>
       <div className="nav-links">

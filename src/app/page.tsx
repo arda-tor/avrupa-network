@@ -9,7 +9,6 @@ import ForWhom from "@/components/landing/ForWhom";
 import HeroCities from "@/components/landing/HeroCities";
 import HowItWorks from "@/components/landing/HowItWorks";
 import Principles from "@/components/landing/Principles";
-import Footer from "@/components/layout/Footer";
 import Navbar from "@/components/layout/Navbar";
 import ConnectLinkedInModal from "@/components/auth/ConnectLinkedInModal";
 import HomeSkeleton from "@/components/ui/HomeSkeleton";
@@ -128,8 +127,6 @@ export default function Home() {
           </div>
         )}
       */}
-
-      <Footer />
 
       {user && linkedInPrompt ? (
         <ConnectLinkedInModal onDismiss={() => setLinkedInPrompt(false)} />

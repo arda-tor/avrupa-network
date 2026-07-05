@@ -72,7 +72,9 @@ export default function LoginPage() {
                 }
 
                 setUserState(resp.user);
-                router.push("/");
+                // Misafirken korumali bir sayfadan yonlendirildiyse oraya geri don.
+                const nextParam = new URLSearchParams(window.location.search).get("next");
+                router.push(nextParam && nextParam.startsWith("/") ? nextParam : "/");
               } finally {
                 setLoading(false);
               }

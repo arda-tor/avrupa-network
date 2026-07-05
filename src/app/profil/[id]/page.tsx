@@ -19,6 +19,7 @@ import {
 import { useConnectedUsersState } from "@/lib/social";
 import { getMe } from "@/lib/auth-api";
 import { currentUserToEditable, emptyEditableProfile } from "@/lib/profile-mapper";
+import { useAuth } from "@/store/auth";
 import { isApiErrorResponse } from "@/types/auth";
 
 function slugify(name: string) {
@@ -78,6 +79,40 @@ export default function ProfileDetailPage() {
 
   const { connectedUserIds, toggleConnectedUserId } = useConnectedUsersState();
 
+  const authUser = useAuth((state) => state.user);
+  const setAuthUser = useAuth((state) => state.setUserState);
+  const [authStatus, setAuthStatus] = useState<"checking" | "authed" | "guest">(
+    authUser ? "authed" : "checking"
+  );
+
+  // Profil goruntuleme sadece giris yapmis kullanicilara acik.
+  useEffect(() => {
+    let cancelled = false;
+
+    (async () => {
+      if (authUser) {
+        setAuthStatus("authed");
+        return;
+      }
+
+      const resp = await getMe();
+      if (cancelled) return;
+
+      if (!isApiErrorResponse(resp) && resp?.user) {
+        setAuthUser(resp.user);
+        setAuthStatus("authed");
+      } else {
+        setAuthStatus("guest");
+        const nextUrl = window.location.pathname + window.location.search;
+        router.replace(`/giris?next=${encodeURIComponent(nextUrl)}`);
+      }
+    })();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [authUser, setAuthUser, router]);
+
   useEffect(() => {
     let cancelled = false;
 
@@ -129,6 +164,18 @@ export default function ProfileDetailPage() {
       cancelled = true;
     };
   }, [previewMode, isMe]);
+
+  // Misafir ise profil icerigini hic render etme; giris sayfasina yonlendiriliyor.
+  if (authStatus !== "authed") {
+    return (
+      <div className="wrap pd-wrap">
+        <Navbar activePath="/profil/duzenle" />
+        <div className="pd-topbar">
+          {authStatus === "checking" ? "Yükleniyor..." : "Giriş sayfasına yönlendiriliyorsun..."}
+        </div>
+      </div>
+    );
+  }
 
   const currentUser = profileToUser(currentProfile);
   const allUsers = [currentUser, ...otherUsers];

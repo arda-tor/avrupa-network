@@ -1,4 +1,3 @@
-import Footer from "@/components/layout/Footer";
 import Navbar from "@/components/layout/Navbar";
 
 export interface LegalSection {
@@ -66,8 +65,6 @@ export default function LegalDoc({
           </section>
         ))}
       </article>
-
-      <Footer />
     </div>
   );
 }
