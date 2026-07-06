@@ -4,8 +4,6 @@ import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import { notFound, useParams, useRouter, useSearchParams } from "next/navigation";
 import Navbar from "@/components/layout/Navbar";
-// Mock kullanici listesi kaldirildi; diger kullanicilar DB aramasindan cekiliyor.
-// import { users } from "@/data/users";
 import { searchUsers } from "@/lib/auth-api";
 import { searchUserToUser } from "@/lib/profile-mapper";
 import type { User } from "@/types";
@@ -18,9 +16,10 @@ import {
   readProfileDraft,
   type EditableProfileLink,
 } from "@/lib/mock-profile";
-import { useConnectedUsersState } from "@/lib/mock-social";
+import { useConnectedUsersState } from "@/lib/social";
 import { getMe } from "@/lib/auth-api";
 import { currentUserToEditable, emptyEditableProfile } from "@/lib/profile-mapper";
+import { useAuth } from "@/store/auth";
 import { isApiErrorResponse } from "@/types/auth";
 
 function slugify(name: string) {
@@ -43,14 +42,6 @@ function getUserAvatarStyle(avatarImage?: string | null) {
 }
 
 type Tab = "about" | "skills" | "links";
-
-// Diger kullanicilar icin sahte baglanti verisi kaldirildi (DB'de karsiligi yok).
-// const otherUserLinks = [
-//   { href: "https://studio.example", value: "studio.example", label: "Portfolyo" },
-//   { href: "https://instagram.com/illustration", value: "@illustration", label: "Instagram" },
-//   { href: "https://dribbble.com/handle", value: "dribbble.com/handle", label: "Dribbble" },
-//   { href: "mailto:hello@studio.example", value: "hello@studio.example", label: "E-posta" },
-// ];
 
 function buildRelatedUsers(pool: User[], currentId: string, role: string, location: string) {
   const roleToken = role
@@ -88,7 +79,40 @@ export default function ProfileDetailPage() {
 
   const { connectedUserIds, toggleConnectedUserId } = useConnectedUsersState();
 
-  // Diger kullanicilar (goruntulenen profil + benzer kisiler) DB'den cekiliyor.
+  const authUser = useAuth((state) => state.user);
+  const setAuthUser = useAuth((state) => state.setUserState);
+  const [authStatus, setAuthStatus] = useState<"checking" | "authed" | "guest">(
+    authUser ? "authed" : "checking"
+  );
+
+  // Profil goruntuleme sadece giris yapmis kullanicilara acik.
+  useEffect(() => {
+    let cancelled = false;
+
+    (async () => {
+      if (authUser) {
+        setAuthStatus("authed");
+        return;
+      }
+
+      const resp = await getMe();
+      if (cancelled) return;
+
+      if (!isApiErrorResponse(resp) && resp?.user) {
+        setAuthUser(resp.user);
+        setAuthStatus("authed");
+      } else {
+        setAuthStatus("guest");
+        const nextUrl = window.location.pathname + window.location.search;
+        router.replace(`/giris?next=${encodeURIComponent(nextUrl)}`);
+      }
+    })();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [authUser, setAuthUser, router]);
+
   useEffect(() => {
     let cancelled = false;
 
@@ -122,7 +146,6 @@ export default function ProfileDetailPage() {
       };
     }
 
-    // The own profile ("me") is loaded from the backend; numeric ids stay mock.
     if (!isMe) return;
 
     let cancelled = false;
@@ -142,6 +165,18 @@ export default function ProfileDetailPage() {
     };
   }, [previewMode, isMe]);
 
+  // Misafir ise profil icerigini hic render etme; giris sayfasina yonlendiriliyor.
+  if (authStatus !== "authed") {
+    return (
+      <div className="wrap pd-wrap">
+        <Navbar activePath="/profil/duzenle" />
+        <div className="pd-topbar">
+          {authStatus === "checking" ? "Yükleniyor..." : "Giriş sayfasına yönlendiriliyorsun..."}
+        </div>
+      </div>
+    );
+  }
+
   const currentUser = profileToUser(currentProfile);
   const allUsers = [currentUser, ...otherUsers];
   const user = allUsers.find((item) => item.id === params?.id);
@@ -152,7 +187,7 @@ export default function ProfileDetailPage() {
       return (
         <div className="wrap pd-wrap">
           <Navbar activePath="/profil/duzenle" />
-          <div className="pd-topbar">Yukleniyor...</div>
+          <div className="pd-topbar">Yükleniyor...</div>
         </div>
       );
     }
@@ -183,20 +218,20 @@ export default function ProfileDetailPage() {
 
     try {
       await navigator.clipboard.writeText(shareUrl);
-      setSavedMessage("Profil baglantisi panoya kopyalandi.");
+      setSavedMessage("Profil bağlantısı panoya kopyalandı.");
     } catch {
-      setSavedMessage("Baglanti kopyalanamadi, adres cubugundan paylasabilirsin.");
+      setSavedMessage("Bağlantı kopyalanamadı, adres çubuğundan paylaşabilirsin.");
     }
   };
 
-  const handlePrimaryAction = () => {
+  const handlePrimaryAction = async () => {
     if (isCurrentUser) {
       router.push("/profil/duzenle");
       return;
     }
 
-    const nextState = toggleConnectedUserId(user.id);
-    setSavedMessage(nextState ? "Profil favorilere eklendi." : "Profil favorilerden cikarildi.");
+    const nextState = await toggleConnectedUserId(user.id);
+    setSavedMessage(nextState ? "Profil favorilere eklendi." : "Profil favorilerden çıkarıldı.");
   };
 
   const highlightedSkills = user.skills.slice(0, 4);
@@ -218,7 +253,7 @@ export default function ProfileDetailPage() {
             router.back();
           }}
         >
-          <span className="pd-arr">←</span> {previewMode ? "Duzenlemeye geri don" : "Aramaya geri don"}
+          <span className="pd-arr">←</span> {previewMode ? "Düzenlemeye geri dön" : "Aramaya geri dön"}
         </button>
       </div>
 
@@ -247,10 +282,10 @@ export default function ProfileDetailPage() {
             <>
               <Link href="/profil/duzenle" className="pd-btn-primary">
                 <span className="pd-btn-icon">✎</span>
-                Profili Duzenle
+                Profili Düzenle
               </Link>
               <button type="button" className="pd-btn-dark" onClick={handleCopyProfileLink}>
-                Baglantiyi Paylas
+                Bağlantıyı Paylaş
               </button>
             </>
           ) : (
@@ -270,9 +305,9 @@ export default function ProfileDetailPage() {
 
       <div className="pd-tabs">
         {([
-          { id: "about", label: "Hakkinda" },
+          { id: "about", label: "Hakkında" },
           { id: "skills", label: "Yetenekler" },
-          { id: "links", label: "Baglantilar" },
+          { id: "links", label: "Bağlantılar" },
         ] as { id: Tab; label: string }[]).map((tab) => (
           <button
             key={tab.id}
@@ -295,9 +330,9 @@ export default function ProfileDetailPage() {
 
             <div className="pd-section">
               <div className="pd-section-label">
-                One cikan yetenekler
+                Öne çıkan yetenekler
                 <button type="button" className="pd-more" onClick={() => setActiveTab("skills")}>
-                  Tumunu gor →
+                  Tümünü gör →
                 </button>
               </div>
               <div className="pd-skill-grid pd-skill-grid-simple">
@@ -313,7 +348,7 @@ export default function ProfileDetailPage() {
 
         {activeTab === "skills" && (
           <div className="pd-section">
-            <div className="pd-section-label">Tum yetenekler</div>
+            <div className="pd-section-label">Tüm yetenekler</div>
             <div className="pd-skills-list">
               {user.skills.map((skill) => (
                 <span key={skill} className="pd-skill-chip">
@@ -326,7 +361,7 @@ export default function ProfileDetailPage() {
 
         {activeTab === "links" && (
           <div className="pd-section">
-            <div className="pd-section-label">Baglantilar</div>
+            <div className="pd-section-label">Bağlantılar</div>
             <div className="pd-links">
               {detailLinks.map((link) => (
                 <a key={link.id} href={link.href} className="pd-link" target="_blank" rel="noreferrer">
@@ -342,7 +377,7 @@ export default function ProfileDetailPage() {
       {!isCurrentUser && relatedUsers.length > 0 && (
         <div className="pd-similar">
           <div className="pd-section-label">
-            Ayni sehir ve meslekte olanlar icin
+            Aynı şehir ve meslekte olanlar için
             <Link href="/ara" className="pd-more">
               Daha fazla →
             </Link>

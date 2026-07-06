@@ -54,7 +54,7 @@ nav {
   padding: 28px 0;
   border-bottom: 1px solid var(--line);
 }
-.logo { display: flex; align-items: center; gap: 10px; font-family: 'Fraunces'; font-weight: 600; font-size: 24px; letter-spacing: -.5px; }
+.logo { display: flex; align-items: center; gap: 10px; font-family: 'Fraunces'; font-weight: 600; font-size: 24px; letter-spacing: -.5px; color: var(--ink); text-decoration: none; }
 .logo-mark {
   width: 32px; height: 32px; background: var(--ink); border-radius: 50%;
   display: grid; place-items: center; color: var(--bg); font-family: 'JetBrains Mono'; font-size: 14px; font-weight: 700;
@@ -155,6 +155,73 @@ h1 em { font-style: italic; color: var(--accent); }
 }
 .section-head h2 { font-family: 'Fraunces'; font-weight: 400; font-size: 44px; letter-spacing: -.025em; }
 .section-head h2 em { font-style: italic; color: var(--accent); }
+
+/* ===== LANDING PAGE ===== */
+
+.lp-hero-actions { display: flex; gap: 12px; margin-top: 36px; flex-wrap: wrap; }
+.lp-hero-actions .btn-primary,
+.lp-hero-actions .btn-secondary {
+  flex: 0 0 auto; text-decoration: none; display: inline-flex; align-items: center; justify-content: center;
+}
+
+/* Hero yan kolon: aga dahil sehirler */
+.hero-aside {
+  border-left: 1px solid var(--line); padding: 60px 0 60px 48px;
+  display: flex; flex-direction: column; justify-content: center;
+}
+.hero-aside-label {
+  font-family: 'JetBrains Mono'; font-size: 11px; letter-spacing: .2em; text-transform: uppercase;
+  color: var(--mute); margin-bottom: 20px;
+}
+.hero-cities { display: flex; flex-direction: column; }
+.hero-city {
+  display: flex; align-items: baseline; justify-content: space-between; gap: 16px;
+  padding: 13px 0; border-bottom: 1px solid var(--line);
+  font-family: 'Fraunces'; font-size: 21px; font-weight: 400; letter-spacing: -.01em;
+}
+.hero-city:first-child { border-top: 1px solid var(--line); }
+.hero-city-co { font-family: 'JetBrains Mono'; font-size: 11px; letter-spacing: .12em; text-transform: uppercase; color: var(--mute); }
+
+/* Bolum + kicker */
+.lp-section { padding: 96px 0; border-bottom: 1px solid var(--line); }
+.lp-kicker {
+  display: flex; align-items: center; gap: 12px; margin-bottom: 8px;
+  font-family: 'JetBrains Mono'; font-size: 11px; letter-spacing: .18em; text-transform: uppercase; color: var(--mute);
+}
+.lp-kicker::before { content: ""; width: 28px; height: 1px; background: var(--mute); }
+
+/* Nasil isliyor — editoryal akis */
+.lp-flow { border-top: 1px solid var(--line); margin-top: 40px; }
+.lp-flow-item {
+  display: grid; grid-template-columns: 130px 1fr; gap: 32px; align-items: baseline;
+  padding: 40px 0; border-bottom: 1px solid var(--line);
+}
+.lp-flow-num { font-family: 'Fraunces'; font-style: italic; font-weight: 400; font-size: 56px; color: var(--accent); line-height: 1; }
+.lp-flow-title { font-family: 'Fraunces'; font-weight: 500; font-size: 30px; letter-spacing: -.02em; margin-bottom: 12px; }
+.lp-flow-desc { font-size: 17px; line-height: 1.6; color: var(--ink-soft); max-width: 580px; }
+
+/* Ilkeler — buyuk ifadeler */
+.lp-principle {
+  display: grid; grid-template-columns: 1fr 1fr; gap: 48px; align-items: start;
+  padding: 44px 0; border-bottom: 1px solid var(--line);
+}
+.lp-principle:first-of-type { border-top: 1px solid var(--line); }
+.lp-principle-head { font-family: 'Fraunces'; font-weight: 400; font-size: clamp(30px, 3.4vw, 42px); letter-spacing: -.03em; line-height: 1.05; }
+.lp-principle-desc { font-size: 17px; line-height: 1.65; color: var(--ink-soft); padding-top: 10px; }
+
+/* Kimler icin — editoryal cumle */
+.lp-lead {
+  font-family: 'Fraunces'; font-weight: 400; font-size: clamp(28px, 4vw, 48px);
+  line-height: 1.25; letter-spacing: -.02em; max-width: 1000px; margin-top: 36px;
+}
+.lp-lead em { font-style: italic; color: var(--accent); }
+
+/* Kapanis cagrisi */
+.lp-cta { padding: 120px 0; text-align: center; border-bottom: 1px solid var(--line); }
+.lp-cta-title { font-family: 'Fraunces'; font-weight: 400; font-size: clamp(40px, 6vw, 78px); line-height: 1.02; letter-spacing: -.035em; max-width: 900px; margin: 0 auto; }
+.lp-cta-title em { font-style: italic; color: var(--accent); }
+.lp-cta-sub { font-size: 18px; color: var(--ink-soft); margin-top: 22px; }
+.lp-cta .lp-hero-actions { justify-content: center; margin-top: 38px; }
 .section-meta { font-family: 'JetBrains Mono'; font-size: 11px; letter-spacing: .15em; text-transform: uppercase; color: var(--mute); }
 
 /* Filter bar */
@@ -255,9 +322,41 @@ h1 em { font-style: italic; color: var(--accent); }
   padding: 40px 0; font-family: 'JetBrains Mono'; font-size: 11px;
   letter-spacing: .1em; text-transform: uppercase; color: var(--mute);
 }
+.foot { border-top: 1px solid var(--line); margin-top: 0; }
+.foot-brand { display: flex; align-items: center; gap: 10px; color: var(--ink); }
 .foot-dots { display: flex; gap: 6px; }
 .foot-dots span { width: 6px; height: 6px; border-radius: 50%; background: var(--mute); }
 .foot-dots span:first-child { background: var(--accent); }
+.foot-links { display: flex; gap: 24px; }
+.foot-links a { color: var(--mute); text-decoration: none; transition: color .2s; }
+.foot-links a:hover { color: var(--accent); }
+.foot-copy { color: var(--mute); }
+
+/* ===== LEGAL / YASAL SAYFALAR ===== */
+.legal { max-width: 820px; margin: 0 auto; padding: 64px 0 96px; }
+.legal-title { font-family: 'Fraunces'; font-weight: 400; font-size: clamp(40px, 6vw, 66px); line-height: 1.02; letter-spacing: -.03em; margin-top: 12px; }
+.legal-meta { font-family: 'JetBrains Mono'; font-size: 12px; letter-spacing: .1em; text-transform: uppercase; color: var(--mute); margin-top: 20px; }
+.legal-note {
+  border-left: 2px solid var(--accent); padding: 6px 0 6px 20px; margin: 32px 0 8px;
+  font-size: 14px; line-height: 1.6; color: var(--ink-soft);
+}
+.legal-intro { font-size: 18px; line-height: 1.7; color: var(--ink-soft); margin-top: 20px; }
+.legal-section { padding: 36px 0; border-bottom: 1px solid var(--line); }
+.legal-section:last-child { border-bottom: none; }
+.legal-h2 {
+  display: flex; gap: 14px; align-items: baseline;
+  font-family: 'Fraunces'; font-weight: 500; font-size: 26px; letter-spacing: -.02em; margin-bottom: 16px;
+}
+.legal-h2 .num { font-style: italic; font-weight: 400; color: var(--accent); }
+.legal-section p { font-size: 16px; line-height: 1.7; color: var(--ink-soft); margin-bottom: 12px; }
+.legal-section p:last-child { margin-bottom: 0; }
+.legal-list { list-style: none; margin: 6px 0 0; padding: 0; }
+.legal-list li {
+  position: relative; padding: 11px 0 11px 24px; font-size: 16px; line-height: 1.6;
+  color: var(--ink-soft); border-bottom: 1px solid var(--line);
+}
+.legal-list li:last-child { border-bottom: none; }
+.legal-list li::before { content: "—"; position: absolute; left: 0; color: var(--accent); }
 
 /* Animations */
 .fade-up { animation: fadeUp .8s cubic-bezier(.2,.7,.2,1) both; }
@@ -385,6 +484,15 @@ h1 em { font-style: italic; color: var(--accent); }
   .profile-card { border-left: none; border-top: 1px solid var(--line); padding: 40px 0; }
   .hero-left { padding: 40px 0; }
   .grid { grid-template-columns: 1fr; }
+  .hero-aside { border-left: none; border-top: 1px solid var(--line); padding: 36px 0; }
+  .lp-section { padding: 60px 0; }
+  .lp-flow-item { grid-template-columns: 1fr; gap: 10px; padding: 32px 0; }
+  .lp-flow-num { font-size: 44px; }
+  .lp-flow-title { font-size: 26px; }
+  .lp-principle { grid-template-columns: 1fr; gap: 14px; padding: 32px 0; }
+  .lp-cta { padding: 72px 0; }
+  .foot { flex-wrap: wrap; gap: 16px; justify-content: flex-start; }
+  .legal { padding: 44px 0 64px; }
   .card { border-right: none !important; }
   .card.spotlight { grid-column: span 1; flex-direction: column; align-items: flex-start; }
   .nav-links { display: none; }

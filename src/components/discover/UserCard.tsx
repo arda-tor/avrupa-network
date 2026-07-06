@@ -12,7 +12,7 @@ interface UserCardProps {
 export default function UserCard({ user, isConnected, onToggleConnect }: UserCardProps) {
   return (
     <div className="card fade-up">
-      <Link href={`/profil/${user.id}`} className="card-main-link" aria-label={`${user.name} profil detaylarini ac`}>
+      <Link href={`/profil/${user.id}`} className="card-main-link" aria-label={`${user.name} profil detaylarını aç`}>
         <div className="card-top">
           <div className={`card-avatar ${user.avatarVariant}`}>{user.initial}</div>
           <div className="card-arrow">

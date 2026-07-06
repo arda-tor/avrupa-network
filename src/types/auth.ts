@@ -18,6 +18,7 @@ export interface CurrentUser {
   email: string | null;
   avatarUrl: string | null;
   profileFields: ProfileField[];
+  linkedInConnected: boolean;
 }
 
 export interface SearchUser {
@@ -29,6 +30,10 @@ export interface SearchUser {
 
 export interface LoginResponse {
   user: CurrentUser;
+}
+
+export interface AuthorizationUrlResponse {
+  authorizationUrl: string;
 }
 
 export interface LoginInput {

@@ -5,21 +5,21 @@ import Link from "next/link";
 import Navbar from "@/components/layout/Navbar";
 import { searchUsers } from "@/lib/auth-api";
 import { searchUserToUser } from "@/lib/profile-mapper";
-import { useConnectedUsersState } from "@/lib/mock-social";
+import { useConnectedUsersState } from "@/lib/social";
 import { isApiErrorResponse } from "@/types/auth";
 import type { User } from "@/types";
 
 const categories = [
-  { id: "design", label: "Tasarim", count: 412 },
-  { id: "software", label: "Yazilim", count: 890 },
-  { id: "art", label: "Sanat & Illustrasyon", count: 204 },
-  { id: "writing", label: "Yazarlik", count: 156 },
-  { id: "photo", label: "Fotograf", count: 178 },
-  { id: "music", label: "Muzik & Ses", count: 92 },
-  { id: "data", label: "Veri & Arastirma", count: 143 },
+  { id: "design", label: "Tasarım" },
+  { id: "software", label: "Yazılım" },
+  { id: "art", label: "Sanat & İllüstrasyon" },
+  { id: "writing", label: "Yazarlık" },
+  { id: "photo", label: "Fotoğraf" },
+  { id: "music", label: "Müzik & Ses" },
+  { id: "data", label: "Veri & Araştırma" },
 ];
 
-const cityOptions = ["Istanbul", "Ankara", "Izmir", "Bursa", "Berlin", "Londra"];
+const cityOptions = ["İstanbul", "Ankara", "İzmir", "Bursa", "Berlin", "Londra"];
 
 function matchesCategory(role: string, catId: string) {
   const normalizedRole = role.toLowerCase();
@@ -48,7 +48,7 @@ function ConnectButton({ userId }: { userId: string }) {
       onClick={(event) => {
         event.preventDefault();
         event.stopPropagation();
-        toggleConnectedUserId(userId);
+        void toggleConnectedUserId(userId);
       }}
     >
       {isConnected ? "✓ Eklendi" : "+ Ekle"}
@@ -57,24 +57,16 @@ function ConnectButton({ userId }: { userId: string }) {
 }
 
 export default function SearchPage() {
-  const [query, setQuery] = useState("");
+  const [query, setQuery] = useState(() => {
+    if (typeof window === "undefined") return "";
+    return new URLSearchParams(window.location.search).get("q") ?? "";
+  });
   const [activeCats, setActiveCats] = useState<string[]>([]);
   const [activeCities, setActiveCities] = useState<string[]>([]);
   const [sortBy, setSortBy] = useState("name");
   const [visibleCount, setVisibleCount] = useState(6);
   const [fetchedUsers, setFetchedUsers] = useState<User[]>([]);
   const [searchError, setSearchError] = useState("");
-
-  useEffect(() => {
-    if (typeof window === "undefined") return;
-
-    const initialQuery = new URLSearchParams(window.location.search).get("q") ?? "";
-    setQuery(initialQuery);
-  }, []);
-
-  useEffect(() => {
-    setVisibleCount(6);
-  }, [query, activeCats, activeCities, sortBy]);
 
   // Debounced backend search: free text -> name, first selected city -> city.
   // Category filtering stays client-side (no matching backend field).
@@ -90,7 +82,7 @@ export default function SearchPage() {
       if (cancelled) return;
 
       if (isApiErrorResponse(resp)) {
-        setSearchError(resp.error?.message ?? "Arama yapilamadi.");
+        setSearchError(resp.error?.message ?? "Arama yapılamadı.");
         setFetchedUsers([]);
       } else {
         setSearchError("");
@@ -122,11 +114,17 @@ export default function SearchPage() {
   const activeChips = [
     ...activeCats.map((cat) => ({
       label: categories.find((category) => category.id === cat)?.label ?? cat,
-      remove: () => setActiveCats((current) => current.filter((value) => value !== cat)),
+      remove: () => {
+        setActiveCats((current) => current.filter((value) => value !== cat));
+        setVisibleCount(6);
+      },
     })),
     ...activeCities.map((city) => ({
       label: city,
-      remove: () => setActiveCities((current) => current.filter((value) => value !== city)),
+      remove: () => {
+        setActiveCities((current) => current.filter((value) => value !== city));
+        setVisibleCount(6);
+      },
     })),
   ];
 
@@ -135,6 +133,7 @@ export default function SearchPage() {
     setActiveCats([]);
     setActiveCities([]);
     setSortBy("name");
+    setVisibleCount(6);
   };
 
   return (
@@ -147,31 +146,47 @@ export default function SearchPage() {
             <div className="sh-fhead">
               Kategori
               {activeCats.length > 0 ? (
-                <span className="sh-fclear" onClick={() => setActiveCats([])}>temizle</span>
+                <span
+                  className="sh-fclear"
+                  onClick={() => {
+                    setActiveCats([]);
+                    setVisibleCount(6);
+                  }}
+                >
+                  temizle
+                </span>
               ) : null}
             </div>
             {categories.map((category) => (
               <label
                 key={category.id}
                 className={`sh-check-item${activeCats.includes(category.id) ? " on" : ""}`}
-                onClick={() => setActiveCats((current) => toggle(current, category.id))}
+                onClick={() => {
+                  setActiveCats((current) => toggle(current, category.id));
+                  setVisibleCount(6);
+                }}
               >
                 <span className="sh-check" />
                 {category.label}
-                <span className="sh-check-count">{category.count}</span>
+                <span className="sh-check-count">
+                  {fetchedUsers.filter((user) => matchesCategory(user.role, category.id)).length}
+                </span>
               </label>
             ))}
           </div>
 
           <div className="sh-fgroup">
-            <div className="sh-fhead">Sehir</div>
+            <div className="sh-fhead">Şehir</div>
             <div className="sh-pills">
               {cityOptions.map((city) => (
                 <button
                   type="button"
                   key={city}
                   className={`sh-pill${activeCities.includes(city) ? " on" : ""}`}
-                  onClick={() => setActiveCities((current) => toggle(current, city))}
+                  onClick={() => {
+                    setActiveCities((current) => toggle(current, city));
+                    setVisibleCount(6);
+                  }}
                 >
                   {city}
                 </button>
@@ -179,13 +194,13 @@ export default function SearchPage() {
             </div>
           </div>
 
-          <button type="button" className="sh-reset" onClick={resetAll}>Tum filtreleri sifirla</button>
+          <button type="button" className="sh-reset" onClick={resetAll}>Tüm filtreleri sıfırla</button>
         </aside>
 
         <main className="sh-results" id="search-results">
           <div className="sh-results-head">
             <div className="sh-results-count">
-              <b>{filteredUsers.length}</b> sonuc
+              <b>{filteredUsers.length}</b> sonuç
               {query ? <span className="sh-results-q"> • &ldquo;{query}&rdquo;</span> : null}
               {searchError ? <span className="sh-results-q"> • {searchError}</span> : null}
             </div>
@@ -193,20 +208,26 @@ export default function SearchPage() {
               <input
                 type="text"
                 className="search"
-                placeholder="Isim, yetenek, rol veya sehir ara..."
+                placeholder="İsim, yetenek, rol veya şehir ara..."
                 value={query}
-                onChange={(event) => setQuery(event.target.value)}
+                onChange={(event) => {
+                  setQuery(event.target.value);
+                  setVisibleCount(6);
+                }}
               />
               <div className="sh-sort">
-                <span className="sh-sort-label">Sirala:</span>
+                <span className="sh-sort-label">Sırala:</span>
                 <select
-                  aria-label="Siralama"
+                  aria-label="Sıralama"
                   value={sortBy}
-                  onChange={(event) => setSortBy(event.target.value)}
+                  onChange={(event) => {
+                    setSortBy(event.target.value);
+                    setVisibleCount(6);
+                  }}
                   className="sh-sort-select"
                 >
                   <option value="name">Alfabetik</option>
-                  <option value="city">Sehre gore</option>
+                  <option value="city">Şehre göre</option>
                 </select>
               </div>
             </div>
@@ -261,16 +282,16 @@ export default function SearchPage() {
 
               {visibleCount < filteredUsers.length ? (
                 <button type="button" className="sh-load-more" onClick={() => setVisibleCount((current) => current + 6)}>
-                  Daha fazla goster ↓
+                  Daha fazla göster ↓
                 </button>
               ) : null}
             </>
           ) : (
             <div className="network-empty">
               <div className="network-empty-icon">◌</div>
-              <p>Aramana uygun bir profil bulunamadi.</p>
+              <p>Aramana uygun bir profil bulunamadı.</p>
               <button type="button" className="btn-ghost network-empty-link" onClick={resetAll}>
-                Filtreleri Sifirla
+                Filtreleri Sıfırla
               </button>
             </div>
           )}

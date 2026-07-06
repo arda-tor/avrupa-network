@@ -1,9 +1,10 @@
 import type { Metadata } from "next";
+import Footer from "@/components/layout/Footer";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "Nexus — Yetenek Ağı",
-  description: "Yeteneğini göster, doğru insanları bul.",
+  title: "Turkhub — Avrupa'daki Türk Ağı",
+  description: "Referans ile çalışan, Avrupa başta olmak üzere dünyada yaşayan Türkleri bir araya getiren güvenilir ağ.",
 };
 
 export default function RootLayout({
@@ -25,7 +26,12 @@ export default function RootLayout({
           rel="stylesheet"
         />
       </head>
-      <body>{children}</body>
+      <body>
+        {children}
+        <div className="wrap">
+          <Footer />
+        </div>
+      </body>
     </html>
   );
 }
