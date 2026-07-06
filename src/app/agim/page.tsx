@@ -1,68 +1,19 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useMemo, useState } from "react";
 import Navbar from "@/components/layout/Navbar";
-import { searchUsers } from "@/lib/auth-api";
-import { searchUserToUser } from "@/lib/profile-mapper";
 import { useConnectedUsersState, useSavedUsersState } from "@/lib/social";
-import { isApiErrorResponse } from "@/types/auth";
 import type { User } from "@/types";
 
 export default function Agim() {
-  const [query, setQuery] = useState("");
-  const [allUsers, setAllUsers] = useState<User[]>([]);
   const { savedUserIds, removeUserFromNetwork } = useSavedUsersState();
   const { connectedUserIds } = useConnectedUsersState();
 
-  useEffect(() => {
-    let cancelled = false;
-
-    (async () => {
-      const resp = await searchUsers({ limit: 50 });
-      if (cancelled) return;
-      if (!isApiErrorResponse(resp)) {
-        setAllUsers(resp.users.map(searchUserToUser));
-      }
-    })();
-
-    return () => {
-      cancelled = true;
-    };
-  }, []);
-
-  const savedUsers = useMemo(
-    () => allUsers.filter((user) => savedUserIds.includes(user.id)),
-    [allUsers, savedUserIds]
-  );
-
-  const filteredUsers = useMemo(() => {
-    const normalizedQuery = query.trim().toLowerCase();
-    if (!normalizedQuery) return savedUsers;
-
-    return savedUsers.filter((user) =>
-      [user.name, user.role, user.location, user.bio, ...user.skills]
-        .join(" ")
-        .toLowerCase()
-        .includes(normalizedQuery)
-    );
-  }, [query, savedUsers]);
+  const savedUsers: User[] = [];
 
   return (
     <div className="wrap">
-      <Navbar
-        activePath="/agim"
-        rightContentRequiresAuth
-        rightContent={(
-          <input
-            type="text"
-            className="search"
-            placeholder="Favorilerimde ara..."
-            value={query}
-            onChange={(event) => setQuery(event.target.value)}
-          />
-        )}
-      />
+      <Navbar activePath="/agim" rightContentRequiresAuth />
 
       <div className="section-head network-page-head">
         <h2>
@@ -77,21 +28,9 @@ export default function Agim() {
           <p>Henüz kimseyi kaydetmedin.</p>
           <Link href="/" className="btn-ghost network-empty-link">Keşfetmeye Başla</Link>
         </div>
-      ) : null}
-
-      {savedUsers.length > 0 && filteredUsers.length === 0 ? (
-        <div className="network-empty">
-          <div className="network-empty-icon">◌</div>
-          <p>Aramana uyan kayıtlı profil bulunamadı.</p>
-          <button type="button" className="btn-ghost network-empty-link" onClick={() => setQuery("")}>
-            Aramayi Temizle
-          </button>
-        </div>
-      ) : null}
-
-      {filteredUsers.length > 0 ? (
+      ) : (
         <section className="grid">
-          {filteredUsers.map((user) => {
+          {savedUsers.map((user) => {
             const isConnected = connectedUserIds.includes(user.id);
 
             return (
@@ -131,8 +70,7 @@ export default function Agim() {
             );
           })}
         </section>
-      ) : null}
-
+      )}
     </div>
   );
 }

@@ -8,7 +8,6 @@ export default function HomeSkeleton() {
           <div className="skeleton-block skeleton-pill" />
           <div className="skeleton-block skeleton-pill" />
         </div>
-        <div className="skeleton-block skeleton-search" />
       </div>
 
       <section className="hero home-skeleton-hero">

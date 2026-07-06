@@ -253,7 +253,7 @@ export default function ProfileDetailPage() {
             router.back();
           }}
         >
-          <span className="pd-arr">←</span> {previewMode ? "Düzenlemeye geri dön" : "Aramaya geri dön"}
+          <span className="pd-arr">←</span> {previewMode ? "Düzenlemeye geri dön" : "Geri dön"}
         </button>
       </div>
 
@@ -378,9 +378,6 @@ export default function ProfileDetailPage() {
         <div className="pd-similar">
           <div className="pd-section-label">
             Aynı şehir ve meslekte olanlar için
-            <Link href="/ara" className="pd-more">
-              Daha fazla →
-            </Link>
           </div>
           <div className="pd-similar-grid">
             {relatedUsers.map((relatedUser) => (
