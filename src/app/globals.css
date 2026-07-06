@@ -612,6 +612,18 @@ h1 em { font-style: italic; color: var(--accent); }
 .btn-mini.danger { color: var(--danger); border-color: var(--danger); }
 .btn-mini:hover { background: var(--bg-2); }
 
+.username-input-row {
+  display: flex; align-items: stretch; gap: 8px;
+}
+.username-input-row input { flex: 1; }
+.copy-btn {
+  font-size: 12px; padding: 0 16px; border-radius: 12px; border: 1px solid var(--ink);
+  background: var(--ink); color: var(--bg); cursor: pointer; font-family: 'Geist'; font-weight: 600;
+  white-space: nowrap; transition: all .15s;
+}
+.copy-btn:hover:not(:disabled) { background: var(--accent); border-color: var(--accent); }
+.copy-btn:disabled { opacity: .4; cursor: not-allowed; }
+
 /* Form fields */
 .field-row { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 20px; }
 .field { display: flex; flex-direction: column; gap: 8px; margin-bottom: 20px; }

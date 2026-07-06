@@ -132,6 +132,24 @@ export default function ProfilDuzenle() {
     }
   }, []);
 
+  const handleCopyProfileUrl = async (): Promise<void> => {
+    const handle = profile.username.trim();
+    if (!handle) {
+      setFlashMessage("Kopyalamak için önce bir kullanıcı adı seç.");
+      return;
+    }
+
+    const origin = typeof window !== "undefined" ? window.location.origin : `https://${shareHost}`;
+    const url = `${origin}/p/${encodeURIComponent(handle)}`;
+
+    try {
+      await navigator.clipboard.writeText(url);
+      setFlashMessage("Profil URL'i panoya kopyalandı.");
+    } catch {
+      setFlashMessage("URL kopyalanamadı, elle seçip kopyalayabilirsin.");
+    }
+  };
+
   // Load the live profile from the backend as the source of truth.
   useEffect(() => {
     let cancelled = false;
@@ -399,8 +417,24 @@ export default function ProfilDuzenle() {
             <div className="field-row">
               <div className="field">
                 <label>Kullanıcı adı</label>
-                <input type="text" value={profile.username} onChange={(event) => updateProfile("username", event.target.value.replace(/\s+/g, "").toLowerCase())} />
-                <span className="field-hint">{shareHost || ""}/p/{profile.username || "kullaniciadi"}</span>
+                <div className="username-input-row">
+                  <input
+                    type="text"
+                    value={profile.username}
+                    onChange={(event) => updateProfile("username", event.target.value.replace(/\s+/g, "").toLowerCase())}
+                    aria-describedby="username-hint"
+                  />
+                  <button
+                    type="button"
+                    className="copy-btn"
+                    onClick={() => void handleCopyProfileUrl()}
+                    disabled={!profile.username}
+                    aria-label="Profil URL'ini kopyala"
+                  >
+                    URL Kopyala
+                  </button>
+                </div>
+                <span id="username-hint" className="field-hint">{shareHost || ""}/p/{profile.username || "kullaniciadi"}</span>
               </div>
               <div className="field">
                 <label>Meslek / Rol <span className="count">{profile.role.length}/60</span></label>
