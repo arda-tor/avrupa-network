@@ -122,6 +122,13 @@ export default function ProfilDuzenle() {
   const [flashMessage, setFlashMessage] = useState("");
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
+  const [shareHost, setShareHost] = useState("");
+
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      setShareHost(window.location.host);
+    }
+  }, []);
 
   // Load the live profile from the backend as the source of truth.
   useEffect(() => {
@@ -390,7 +397,7 @@ export default function ProfilDuzenle() {
               <div className="field">
                 <label>Kullanici adi</label>
                 <input type="text" value={profile.username} onChange={(event) => updateProfile("username", event.target.value.replace(/\s+/g, "").toLowerCase())} />
-                <span className="field-hint">nexus.app/{profile.username || "kullaniciadi"}</span>
+                <span className="field-hint">{shareHost || ""}/p/{profile.username || "kullaniciadi"}</span>
               </div>
               <div className="field">
                 <label>Meslek / Rol <span className="count">{profile.role.length}/60</span></label>
