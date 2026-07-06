@@ -17,6 +17,7 @@ interface NavbarProps {
 
 const navItems = [
   { href: "/", label: "Ana Sayfa" },
+  { href: "/ara", label: "Ara" },
   { href: "/agim", label: "Favorilerim", requiresAuth: true },
   { href: "/profil/duzenle", label: "Profilim", requiresAuth: true },
 ];

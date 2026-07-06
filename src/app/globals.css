@@ -68,6 +68,11 @@ nav {
 .nav-links a { color: var(--ink); text-decoration: none; position: relative; padding: 4px 0; }
 .nav-links a.active::after { content: ""; position: absolute; bottom: -4px; left: 0; right: 0; height: 2px; background: var(--accent); }
 .nav-actions { display: flex; gap: 12px; align-items: center; }
+.search {
+  background: var(--card); border: 1px solid var(--line); padding: 10px 16px; border-radius: 999px;
+  font-family: 'Geist'; font-size: 13px; width: 260px; color: var(--ink);
+}
+.search::placeholder { color: var(--mute); }
 .btn-ghost {
   background: var(--ink); color: var(--bg); padding: 10px 18px; border-radius: 999px;
   font-size: 13px; font-weight: 500; border: none; cursor: pointer; transition: all .2s;
@@ -490,6 +495,7 @@ h1 em { font-style: italic; color: var(--accent); }
   .card { border-right: none !important; }
   .card.spotlight { grid-column: span 1; flex-direction: column; align-items: flex-start; }
   .nav-links { display: none; }
+  .search { width: 160px; }
   .section-head h2 { font-size: 32px; }
   .skeleton-nav { flex-wrap: wrap; }
   .skeleton-nav-links { order: 3; width: 100%; }
