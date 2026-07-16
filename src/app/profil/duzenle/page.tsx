@@ -19,6 +19,7 @@ import { deleteAccount, getMe, updateProfile as updateProfileRequest } from "@/l
 import { currentUserToEditable, editableToUpdateFields, emptyEditableProfile } from "@/lib/profile-mapper";
 import { useAuth } from "@/store/auth";
 import { isApiErrorResponse } from "@/types/auth";
+import { LinkIcon } from "@/components/ui/LinkIcon";
 import type { AvatarVariant } from "@/types";
 
 const MAX_AVATAR_BYTES = 500 * 1024;
@@ -310,7 +311,12 @@ export default function ProfilDuzenle() {
 
   const handlePreview = () => {
     writeProfileDraft(profile);
-    router.push("/profil/me?preview=1");
+    const handle = profile.username.trim();
+    if (handle) {
+      router.push(`/p/${handle}?preview=1`);
+    } else {
+      setFlashMessage("Önizleme için önce bir kullanıcı adı belirleyin.");
+    }
   };
 
   return (
@@ -321,10 +327,10 @@ export default function ProfilDuzenle() {
         rightContent={<span className="autosave"><span className="dot"></span> {dirty ? "taslak açık" : "yayın ile senkron"}</span>}
       />
 
-      <div className="breadcrumb">
-        <Link href="/profil/me">Profilim</Link>
+      <div className="pd-breadcrumbs">
+        <Link href={`/p/${profile.username || ""}`}>Profilim</Link>
         <span className="sep">/</span>
-        <Link href="/profil/me">{getProfileName(profile)}</Link>
+        <Link href={`/p/${profile.username || ""}`}>{getProfileName(profile)}</Link>
         <span className="sep">/</span>
         <span className="current">Düzenle</span>
       </div>
@@ -712,8 +718,9 @@ export default function ProfilDuzenle() {
                 <div className="pv-links">
                   {previewLinks.length > 0 ? (
                     previewLinks.map((link) => (
-                      <a key={link.id} href={normalizeProfileLinkHref(link)} target="_blank" rel="noreferrer">
-                        {formatProfileLinkValue(link)}
+                      <a key={link.id} href={normalizeProfileLinkHref(link)} target="_blank" rel="noreferrer" className="flex items-center gap-1.5">
+                        <LinkIcon type={link.type} className="h-3.5 w-3.5 opacity-60 shrink-0" />
+                        <span className="truncate">{formatProfileLinkValue(link)}</span>
                       </a>
                     ))
                   ) : (

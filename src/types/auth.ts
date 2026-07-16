@@ -14,6 +14,7 @@ export interface ProfileField {
 
 export interface CurrentUser {
   id: string;
+  username: string;
   fullName: string;
   email: string | null;
   avatarUrl: string | null;
@@ -23,6 +24,7 @@ export interface CurrentUser {
 
 export interface SearchUser {
   id: string;
+  username: string;
   fullName: string;
   avatarUrl: string | null;
   profileFields: ProfileField[];
@@ -53,6 +55,7 @@ export interface UpdateProfileInput {
 }
 
 export interface SearchUsersParams {
+  ids?: string[];
   name?: string;
   city?: string;
   country?: string;

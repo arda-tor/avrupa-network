@@ -85,7 +85,7 @@ export default function SearchPage() {
 
             return (
               <div key={user.id} className="card fade-up">
-                <Link href={`/profil/${user.id}`} className="card-main-link" aria-label={`${user.name} profil detaylarını aç`}>
+                <Link href={`/p/${user.username}`} className="card-main-link" aria-label={`${user.name} profil detaylarını aç`}>
                   <div className="card-top">
                     <div className={`card-avatar ${user.avatarVariant}`}>{user.initial}</div>
                     <div className="card-arrow">

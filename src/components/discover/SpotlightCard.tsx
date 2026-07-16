@@ -7,7 +7,7 @@ interface SpotlightCardProps {
 
 export default function SpotlightCard({ user }: SpotlightCardProps) {
   return (
-    <Link href={`/profil/${user.id}`} className="card spotlight fade-up">
+    <Link href={`/p/${user.username}`} className="card spotlight fade-up">
       <div className={`card-avatar ${user.avatarVariant}`}>{user.initial}</div>
       <div className="spot-content">
         <div className="spot-tag">{user.spotlightTag}</div>

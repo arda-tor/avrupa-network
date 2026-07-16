@@ -113,11 +113,19 @@ export async function deleteAccount(): Promise<UnifiedResponse<void>> {
   return baseRequest<void>("/auth/me", "DELETE", undefined, { [csrf.headerName]: csrf.csrfToken });
 }
 
+export async function getPublicProfile(username: string): Promise<UnifiedResponse<{ profile: SearchUser & { username: string } }>> {
+  return baseRequest<{ profile: SearchUser & { username: string } }>(`/p/${username}`, "GET");
+}
+
 export async function searchUsers(params: SearchUsersParams): Promise<UnifiedResponse<{ users: SearchUser[] }>> {
   const query = new URLSearchParams();
   Object.entries(params).forEach(([key, value]) => {
     if (value !== undefined && value !== null && `${value}`.trim() !== "") {
-      query.set(key, String(value));
+      if (Array.isArray(value)) {
+        query.set(key, value.join(','));
+      } else {
+        query.set(key, String(value));
+      }
     }
   });
   const suffix = query.toString() ? `?${query.toString()}` : "";

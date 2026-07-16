@@ -1,15 +1,59 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import Navbar from "@/components/layout/Navbar";
+import { searchUsers } from "@/lib/auth-api";
+import { searchUserToUser } from "@/lib/profile-mapper";
 import { useConnectedUsersState, useSavedUsersState } from "@/lib/social";
+import { isApiErrorResponse } from "@/types/auth";
 import type { User } from "@/types";
 
 export default function Agim() {
-  const { savedUserIds, removeUserFromNetwork } = useSavedUsersState();
-  const { connectedUserIds } = useConnectedUsersState();
+  const { savedUserIds, removeUserFromNetwork, loading: savedLoading } = useSavedUsersState();
+  const { connectedUserIds, loading: connectedLoading } = useConnectedUsersState();
 
-  const savedUsers: User[] = [];
+  const [savedUsers, setSavedUsers] = useState<User[]>([]);
+  const [loaded, setLoaded] = useState(false);
+
+  useEffect(() => {
+    if (savedLoading) return;
+
+    let cancelled = false;
+
+    if (savedUserIds.length === 0) {
+      setSavedUsers([]);
+      setLoaded(true);
+      return;
+    }
+
+    (async () => {
+      const resp = await searchUsers({ ids: savedUserIds, limit: 50 });
+      if (cancelled) return;
+
+      if (!isApiErrorResponse(resp)) {
+        const users = resp.users.map(searchUserToUser);
+        users.sort((a, b) => savedUserIds.indexOf(a.id) - savedUserIds.indexOf(b.id));
+        setSavedUsers(users);
+      }
+      setLoaded(true);
+    })();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [savedUserIds, savedLoading]);
+
+  if (!loaded) {
+    return (
+      <div className="wrap">
+        <Navbar activePath="/agim" rightContentRequiresAuth />
+        <div className="section-head network-page-head">
+          <h2>Yükleniyor...</h2>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="wrap">
@@ -35,7 +79,7 @@ export default function Agim() {
 
             return (
               <div key={user.id} className="card fade-up">
-                <Link href={`/profil/${user.id}`} className="card-main-link" aria-label={`${user.name} profil detaylarını aç`}>
+                <Link href={`/p/${user.username}`} className="card-main-link" aria-label={`${user.name} profil detaylarını aç`}>
                   <div className="card-top">
                     <div className={`card-avatar ${user.avatarVariant}`}>{user.initial}</div>
                     <div className="card-arrow">

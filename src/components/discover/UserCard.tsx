@@ -7,12 +7,13 @@ interface UserCardProps {
   user: User;
   isConnected: boolean;
   onToggleConnect: (id: string) => void;
+  className?: string;
 }
 
-export default function UserCard({ user, isConnected, onToggleConnect }: UserCardProps) {
+export default function UserCard({ user, isConnected, onToggleConnect, className }: UserCardProps) {
   return (
-    <div className="card fade-up">
-      <Link href={`/profil/${user.id}`} className="card-main-link" aria-label={`${user.name} profil detaylarını aç`}>
+    <div className={`card fade-up ${className || ""}`}>
+      <Link href={`/p/${user.username}`} className="card-main-link" aria-label={`${user.name} profil detaylarını aç`}>
         <div className="card-top">
           <div className={`card-avatar ${user.avatarVariant}`}>{user.initial}</div>
           <div className="card-arrow">

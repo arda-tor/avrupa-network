@@ -57,11 +57,12 @@ export default function Navbar({
           {
             user ? (
               <div className="flex items-center gap-2">
-                <span
-                  className="inline-flex min-h-10 items-center justify-center rounded-full border border-transparent px-4 text-[13px] font-semibold text-ink transition "
+                <Link
+                  href={`/p/${user.username}`}
+                  className="inline-flex min-h-10 items-center justify-center rounded-full border border-transparent px-4 text-[13px] font-semibold text-ink transition hover:border-line hover:bg-bg-2"
                 >
                   {user.fullName}
-                </span>
+                </Link>
                 <button
                   type="button"
                   onClick={handleLogout}
