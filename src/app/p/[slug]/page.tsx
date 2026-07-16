@@ -78,7 +78,7 @@ export default function ProfileDetailPage() {
   const [targetUser, setTargetUser] = useState<User | null>(null);
   const [targetUserLoaded, setTargetUserLoaded] = useState(false);
 
-  const { connectedUserIds, toggleConnectedUserId } = useConnectedUsersState();
+  const { connectedUsernames, toggleConnectedUserId } = useConnectedUsersState();
 
   const authUser = useAuth((state) => state.user);
   const setAuthUser = useAuth((state) => state.setUserState);
@@ -214,7 +214,7 @@ export default function ProfileDetailPage() {
 
   const isCurrentUser = user.id === authUser?.id || isMe;
   const slug = isCurrentUser ? currentProfile.username : slugify(user.name);
-  const isConnected = connectedUserIds.includes(user.id);
+  const isConnected = connectedUsernames.includes(user.username);
   const relatedUsers = isCurrentUser
     ? otherUsers.slice(0, 3)
     : buildRelatedUsers(otherUsers, user.id, user.role, user.location);
@@ -248,7 +248,7 @@ export default function ProfileDetailPage() {
       return;
     }
 
-    const nextState = await toggleConnectedUserId(user.id);
+    const nextState = await toggleConnectedUserId(user.username);
     setSavedMessage(nextState ? "Profil favorilere eklendi." : "Profil favorilerden çıkarıldı.");
   };
 
