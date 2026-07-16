@@ -157,6 +157,7 @@ export function searchUserToUser(dto: SearchUser): User {
 
   return {
     id: dto.id,
+    username: dto.username || "",
     name,
     initial: name.charAt(0).toUpperCase(),
     role: fields.get("role") ?? fields.get("jobTitle") ?? "",

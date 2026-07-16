@@ -16,7 +16,7 @@ export default function SearchPage() {
   const [users, setUsers] = useState<User[]>([]);
   const [error, setError] = useState("");
   const [loaded, setLoaded] = useState(false);
-  const { connectedUserIds, toggleConnectedUserId } = useConnectedUsersState();
+  const { connectedUsernames, toggleConnectedUserId } = useConnectedUsersState();
 
   useEffect(() => {
     let cancelled = false;
@@ -81,11 +81,11 @@ export default function SearchPage() {
       {users.length > 0 ? (
         <section className="grid">
           {users.map((user) => {
-            const isConnected = connectedUserIds.includes(user.id);
+            const isConnected = connectedUsernames.includes(user.username);
 
             return (
               <div key={user.id} className="card fade-up">
-                <Link href={`/profil/${user.id}`} className="card-main-link" aria-label={`${user.name} profil detaylarını aç`}>
+                <Link href={`/p/${user.username}`} className="card-main-link" aria-label={`${user.name} profil detaylarını aç`}>
                   <div className="card-top">
                     <div className={`card-avatar ${user.avatarVariant}`}>{user.initial}</div>
                     <div className="card-arrow">
@@ -111,7 +111,7 @@ export default function SearchPage() {
                   <button
                     type="button"
                     className={`card-connect${isConnected ? " connected" : ""}`}
-                    onClick={() => void toggleConnectedUserId(user.id)}
+                    onClick={() => void toggleConnectedUserId(user.username)}
                   >
                     {isConnected ? "✓ Eklendi" : "+ Ekle"}
                   </button>

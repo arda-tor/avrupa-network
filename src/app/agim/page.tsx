@@ -1,15 +1,65 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import Navbar from "@/components/layout/Navbar";
+import { getPublicProfile } from "@/lib/auth-api";
+import { searchUserToUser } from "@/lib/profile-mapper";
 import { useConnectedUsersState, useSavedUsersState } from "@/lib/social";
+import { isApiErrorResponse } from "@/types/auth";
 import type { User } from "@/types";
 
 export default function Agim() {
-  const { savedUserIds, removeUserFromNetwork } = useSavedUsersState();
-  const { connectedUserIds } = useConnectedUsersState();
+  const { savedUsernames, removeUserFromNetwork, loading: savedLoading } = useSavedUsersState();
+  const { connectedUsernames, loading: connectedLoading } = useConnectedUsersState();
 
-  const savedUsers: User[] = [];
+  const [savedUsers, setSavedUsers] = useState<User[]>([]);
+  const [loaded, setLoaded] = useState(false);
+
+  useEffect(() => {
+    if (savedLoading) return;
+
+    let cancelled = false;
+
+    if (savedUsernames.length === 0) {
+      setSavedUsers([]);
+      setLoaded(true);
+      return;
+    }
+
+    (async () => {
+      const promises = savedUsernames.map(async (username) => {
+        const resp = await getPublicProfile(username);
+        if (isApiErrorResponse(resp)) return null;
+        return resp.profile;
+      });
+
+      const profiles = await Promise.all(promises);
+      if (cancelled) return;
+
+      const validProfiles = profiles.filter((p): p is NonNullable<typeof p> => p !== null);
+      const users = validProfiles.map(searchUserToUser);
+      
+      users.sort((a, b) => savedUsernames.indexOf(a.username) - savedUsernames.indexOf(b.username));
+      setSavedUsers(users);
+      setLoaded(true);
+    })();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [savedUsernames, savedLoading]);
+
+  if (!loaded) {
+    return (
+      <div className="wrap">
+        <Navbar activePath="/agim" rightContentRequiresAuth />
+        <div className="section-head network-page-head">
+          <h2>Yükleniyor...</h2>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="wrap">
@@ -31,11 +81,11 @@ export default function Agim() {
       ) : (
         <section className="grid">
           {savedUsers.map((user) => {
-            const isConnected = connectedUserIds.includes(user.id);
+            const isConnected = connectedUsernames.includes(user.username);
 
             return (
               <div key={user.id} className="card fade-up">
-                <Link href={`/profil/${user.id}`} className="card-main-link" aria-label={`${user.name} profil detaylarını aç`}>
+                <Link href={`/p/${user.username}`} className="card-main-link" aria-label={`${user.name} profil detaylarını aç`}>
                   <div className="card-top">
                     <div className={`card-avatar ${user.avatarVariant}`}>{user.initial}</div>
                     <div className="card-arrow">
@@ -61,7 +111,7 @@ export default function Agim() {
                   <button
                     type="button"
                     className="card-connect network-remove"
-                    onClick={() => void removeUserFromNetwork(user.id)}
+                    onClick={() => void removeUserFromNetwork(user.username)}
                   >
                     Kaldır
                   </button>

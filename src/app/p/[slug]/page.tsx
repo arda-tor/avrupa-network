@@ -4,7 +4,7 @@ import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import { notFound, useParams, useRouter, useSearchParams } from "next/navigation";
 import Navbar from "@/components/layout/Navbar";
-import { searchUsers } from "@/lib/auth-api";
+import { searchUsers, getPublicProfile } from "@/lib/auth-api";
 import { searchUserToUser } from "@/lib/profile-mapper";
 import type { User } from "@/types";
 import {
@@ -18,9 +18,10 @@ import {
 } from "@/lib/mock-profile";
 import { useConnectedUsersState } from "@/lib/social";
 import { getMe } from "@/lib/auth-api";
-import { currentUserToEditable, emptyEditableProfile } from "@/lib/profile-mapper";
+import { emptyEditableProfile, currentUserToEditable } from "@/lib/profile-mapper";
 import { useAuth } from "@/store/auth";
 import { isApiErrorResponse } from "@/types/auth";
+import { LinkIcon } from "@/components/ui/LinkIcon";
 
 function slugify(name: string) {
   return name
@@ -62,12 +63,10 @@ function buildRelatedUsers(pool: User[], currentId: string, role: string, locati
 }
 
 export default function ProfileDetailPage() {
-  const params = useParams<{ id: string }>();
+  const params = useParams<{ slug: string }>();
   const router = useRouter();
   const searchParams = useSearchParams();
   const previewMode = searchParams.get("preview") === "1";
-
-  const isMe = params?.id === "me";
 
   const [activeTab, setActiveTab] = useState<Tab>("about");
   const [savedMessage, setSavedMessage] = useState("");
@@ -76,8 +75,10 @@ export default function ProfileDetailPage() {
   );
   const [otherUsers, setOtherUsers] = useState<User[]>([]);
   const [othersLoaded, setOthersLoaded] = useState(false);
+  const [targetUser, setTargetUser] = useState<User | null>(null);
+  const [targetUserLoaded, setTargetUserLoaded] = useState(false);
 
-  const { connectedUserIds, toggleConnectedUserId } = useConnectedUsersState();
+  const { connectedUsernames, toggleConnectedUserId } = useConnectedUsersState();
 
   const authUser = useAuth((state) => state.user);
   const setAuthUser = useAuth((state) => state.setUserState);
@@ -131,6 +132,24 @@ export default function ProfileDetailPage() {
   }, []);
 
   useEffect(() => {
+    let cancelled = false;
+
+    (async () => {
+      if (!params?.slug) return;
+      
+      const resp = await getPublicProfile(params.slug);
+      if (cancelled) return;
+
+      if (!isApiErrorResponse(resp) && resp.profile) {
+        setTargetUser(searchUserToUser(resp.profile));
+      }
+      setTargetUserLoaded(true);
+    })();
+
+    return () => { cancelled = true; };
+  }, [params?.slug]);
+
+  useEffect(() => {
     if (typeof window === "undefined") return;
 
     // Preview mode renders the unpublished draft straight from localStorage.
@@ -145,8 +164,6 @@ export default function ProfileDetailPage() {
         window.removeEventListener(MOCK_PROFILE_EVENT, syncProfile);
       };
     }
-
-    if (!isMe) return;
 
     let cancelled = false;
     (async () => {
@@ -163,7 +180,7 @@ export default function ProfileDetailPage() {
     return () => {
       cancelled = true;
     };
-  }, [previewMode, isMe]);
+  }, [previewMode]);
 
   // Misafir ise profil icerigini hic render etme; giris sayfasina yonlendiriliyor.
   if (authStatus !== "authed") {
@@ -177,13 +194,14 @@ export default function ProfileDetailPage() {
     );
   }
 
+  const isMe = authUser?.username === params?.slug;
+
   const currentUser = profileToUser(currentProfile);
-  const allUsers = [currentUser, ...otherUsers];
-  const user = allUsers.find((item) => item.id === params?.id);
+  const user = isMe && previewMode ? currentUser : targetUser;
 
   if (!user) {
     // DB listesi henuz gelmediyse notFound tetiklemeden bekle.
-    if (!isMe && !othersLoaded) {
+    if (!targetUserLoaded) {
       return (
         <div className="wrap pd-wrap">
           <Navbar activePath="/profil/duzenle" />
@@ -194,9 +212,9 @@ export default function ProfileDetailPage() {
     notFound();
   }
 
-  const isCurrentUser = user.id === "me";
+  const isCurrentUser = user.id === authUser?.id || isMe;
   const slug = isCurrentUser ? currentProfile.username : slugify(user.name);
-  const isConnected = connectedUserIds.includes(user.id);
+  const isConnected = connectedUsernames.includes(user.username);
   const relatedUsers = isCurrentUser
     ? otherUsers.slice(0, 3)
     : buildRelatedUsers(otherUsers, user.id, user.role, user.location);
@@ -213,7 +231,7 @@ export default function ProfileDetailPage() {
   }));
 
   const handleCopyProfileLink = async () => {
-    const sharePath = isCurrentUser ? `/profil/me${previewMode ? "?preview=1" : ""}` : `/profil/${user.id}`;
+    const sharePath = `/p/${user.username}${previewMode ? "?preview=1" : ""}`;
     const shareUrl = typeof window === "undefined" ? sharePath : `${window.location.origin}${sharePath}`;
 
     try {
@@ -230,7 +248,7 @@ export default function ProfileDetailPage() {
       return;
     }
 
-    const nextState = await toggleConnectedUserId(user.id);
+    const nextState = await toggleConnectedUserId(user.username);
     setSavedMessage(nextState ? "Profil favorilere eklendi." : "Profil favorilerden çıkarıldı.");
   };
 
@@ -365,7 +383,10 @@ export default function ProfileDetailPage() {
             <div className="pd-links">
               {detailLinks.map((link) => (
                 <a key={link.id} href={link.href} className="pd-link" target="_blank" rel="noreferrer">
-                  <span className="pd-link-left">{link.value}</span>
+                  <span className="pd-link-left flex items-center gap-2">
+                    <LinkIcon type={link.label} className="h-[18px] w-[18px] opacity-70" />
+                    {link.value}
+                  </span>
                   <span className="pd-link-tag">{link.label}</span>
                 </a>
               ))}
@@ -384,7 +405,7 @@ export default function ProfileDetailPage() {
           </div>
           <div className="pd-similar-grid">
             {relatedUsers.map((relatedUser) => (
-              <Link key={relatedUser.id} href={`/profil/${relatedUser.id}`} className="pd-similar-card">
+              <Link key={relatedUser.id} href={`/p/${relatedUser.username}`} className="pd-similar-card">
                 <div className={`pd-similar-avatar ${relatedUser.avatarVariant}`}>{relatedUser.initial}</div>
                 <div className="pd-similar-name">{relatedUser.name}</div>
                 <div className="pd-similar-meta">{relatedUser.role}</div>
