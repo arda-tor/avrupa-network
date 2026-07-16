@@ -154,6 +154,7 @@ export function getProfileSummarySkills(profile: EditableProfile, limit = 4) {
 export function profileToUser(profile: EditableProfile): User {
   return {
     id: "me",
+    username: profile.username || "",
     name: getProfileName(profile),
     initial: getProfileInitial(profile),
     role: profile.role,
